@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.animation.core.CubicBezier
+import androidx.compose.animation.core.CubicBezierEasing
 
 data class ResonaTextStyle(
     val size: androidx.compose.ui.unit.TextUnit,
@@ -17,7 +17,7 @@ data class ResonaTextStyle(
 
 data class MotionSpec(
     val ms: Int,
-    val curve: CubicBezier,
+    val curve: CubicBezierEasing,
 )
 
 object GeneratedTokens {
@@ -153,48 +153,48 @@ object GeneratedTokens {
     val Field: Dp = 6.dp
 
     // ---- Motion ----
-    val Enter: MotionSpec = MotionSpec(
+    val EnterMotion: MotionSpec = MotionSpec(
         ms = 240,
-        curve = CubicBezier(0.23f, 1f, 0.32f, 1f),
+        curve = CubicBezierEasing(0.23f, 1f, 0.32f, 1f),
     )
 
-    val Press: MotionSpec = MotionSpec(
+    val PressMotion: MotionSpec = MotionSpec(
         ms = 160,
-        curve = CubicBezier(0f, 0f, 1f, 1f),
+        curve = CubicBezierEasing(0f, 0f, 1f, 1f),
     )
 
-    val Sheet: MotionSpec = MotionSpec(
+    val SheetMotion: MotionSpec = MotionSpec(
         ms = 320,
-        curve = CubicBezier(0.32f, 0.72f, 0f, 1f),
+        curve = CubicBezierEasing(0.32f, 0.72f, 0f, 1f),
     )
 
-    val NowPlaying: MotionSpec = MotionSpec(
+    val NowPlayingMotion: MotionSpec = MotionSpec(
         ms = 380,
-        curve = CubicBezier(0.32f, 0.72f, 0f, 1f),
+        curve = CubicBezierEasing(0.32f, 0.72f, 0f, 1f),
     )
 
-    val Drawer: MotionSpec = MotionSpec(
+    val DrawerMotion: MotionSpec = MotionSpec(
         ms = 320,
-        curve = CubicBezier(0.2f, 0.8f, 0.2f, 1f),
+        curve = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f),
     )
 
-    val Dialog: MotionSpec = MotionSpec(
+    val DialogMotion: MotionSpec = MotionSpec(
         ms = 250,
-        curve = CubicBezier(0f, 0f, 1f, 1f),
+        curve = CubicBezierEasing(0f, 0f, 1f, 1f),
     )
 
-    val Toast: MotionSpec = MotionSpec(
+    val ToastMotion: MotionSpec = MotionSpec(
         ms = 300,
-        curve = CubicBezier(0f, 0f, 1f, 1f),
+        curve = CubicBezierEasing(0f, 0f, 1f, 1f),
     )
 
-    val Toggle: MotionSpec = MotionSpec(
+    val ToggleMotion: MotionSpec = MotionSpec(
         ms = 200,
-        curve = CubicBezier(0f, 0f, 1f, 1f),
+        curve = CubicBezierEasing(0f, 0f, 1f, 1f),
     )
 
-    val Lyric: MotionSpec = MotionSpec(
+    val LyricMotion: MotionSpec = MotionSpec(
         ms = 200,
-        curve = CubicBezier(0f, 0f, 1f, 1f),
+        curve = CubicBezierEasing(0f, 0f, 1f, 1f),
     )
 }

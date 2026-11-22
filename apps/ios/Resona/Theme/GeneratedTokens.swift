@@ -117,8 +117,8 @@ public enum ResonaTokens {
     static let Field: CGFloat = 6
 
     // MARK: - Motion
-    static let Enter = MotionSpec(ms: 240, control1: CGPoint(x: 0.23, y: 1), control2: CGPoint(x: 0.32, y: 1))
-    static let Sheet = MotionSpec(ms: 320, control1: CGPoint(x: 0.32, y: 0.72), control2: CGPoint(x: 0, y: 1))
-    static let NowPlaying = MotionSpec(ms: 380, control1: CGPoint(x: 0.32, y: 0.72), control2: CGPoint(x: 0, y: 1))
-    static let Drawer = MotionSpec(ms: 320, control1: CGPoint(x: 0.2, y: 0.8), control2: CGPoint(x: 0.2, y: 1))
+    static let EnterMotion = MotionSpec(ms: 240, control1: CGPoint(x: 0.23, y: 1), control2: CGPoint(x: 0.32, y: 1))
+    static let SheetMotion = MotionSpec(ms: 320, control1: CGPoint(x: 0.32, y: 0.72), control2: CGPoint(x: 0, y: 1))
+    static let NowPlayingMotion = MotionSpec(ms: 380, control1: CGPoint(x: 0.32, y: 0.72), control2: CGPoint(x: 0, y: 1))
+    static let DrawerMotion = MotionSpec(ms: 320, control1: CGPoint(x: 0.2, y: 0.8), control2: CGPoint(x: 0.2, y: 1))
 }

@@ -49,10 +49,10 @@ const ktSpace = Object.entries(tokens.space)
 const ktRadius = Object.entries(tokens.radius)
   .map(([k, v]) => `    val ${pascal(k)}: Dp = ${v}.dp`).join('\n');
 
-const curve = (c) => `CubicBezier(${beam(c)})`;
+const curve = (c) => `CubicBezierEasing(${beam(c)})`;
 const ktMotion = Object.entries(tokens.motion)
   .filter(([, v]) => typeof v === 'object')
-  .map(([k, v]) => `    val ${pascal(k)}: MotionSpec = MotionSpec(\n        ms = ${v.ms},\n        curve = ${v.curve ? curve(v.curve) : 'CubicBezier(0f, 0f, 1f, 1f)'},\n    )`)
+  .map(([k, v]) => `    val ${pascal(k)}Motion: MotionSpec = MotionSpec(\n        ms = ${v.ms},\n        curve = ${v.curve ? curve(v.curve) : 'CubicBezierEasing(0f, 0f, 1f, 1f)'},\n    )`)
   .join('\n\n');
 
 const kotlin = `package com.resona.app.ui.theme
@@ -63,7 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.animation.core.CubicBezier
+import androidx.compose.animation.core.CubicBezierEasing
 
 data class ResonaTextStyle(
     val size: androidx.compose.ui.unit.TextUnit,
@@ -74,7 +74,7 @@ data class ResonaTextStyle(
 
 data class MotionSpec(
     val ms: Int,
-    val curve: CubicBezier,
+    val curve: CubicBezierEasing,
 )
 
 object GeneratedTokens {
@@ -122,7 +122,7 @@ const swiftMotion = Object.entries(tokens.motion)
   .filter(([, v]) => typeof v === 'object' && v.curve)
   .map(([k, v]) => {
     const [x1, y1, x2, y2] = v.curve;
-    return `    static let ${pascal(k)} = MotionSpec(ms: ${v.ms}, control1: CGPoint(x: ${x1}, y: ${y1}), control2: CGPoint(x: ${x2}, y: ${y2}))`;
+    return `    static let ${pascal(k)}Motion = MotionSpec(ms: ${v.ms}, control1: CGPoint(x: ${x1}, y: ${y1}), control2: CGPoint(x: ${x2}, y: ${y2}))`;
   }).join('\n');
 
 const swift = `import SwiftUI

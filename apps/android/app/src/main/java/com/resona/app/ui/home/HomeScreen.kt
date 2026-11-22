@@ -111,7 +111,7 @@ private fun QuickCard(title: String, gradient: List<Color>, modifier: Modifier =
     Box(
         modifier = modifier
             .height(T.QuickTileDp)
-            .clip(RoundedCornerShape(T.ArtDp))
+            .clip(RoundedCornerShape(T.Art))
             .background(Brush.verticalGradient(gradient)),
         contentAlignment = Alignment.CenterStart,
     ) {
@@ -137,7 +137,7 @@ private fun TrackRow(track: TrackRow) {
         Box(
             modifier = Modifier
                 .size(T.ArtRowDp)
-                .clip(RoundedCornerShape(T.ArtDp))
+                .clip(RoundedCornerShape(T.Art))
                 .background(Brush.verticalGradient(track.gradient)),
         )
         Spacer(Modifier.width(T.MdDp))
