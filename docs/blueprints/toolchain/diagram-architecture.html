@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --text: #111827; --text-sub: #6B7280; --border: #E5E7EB; --connector: #94A3B8;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #FFFFFF; color: var(--text); -webkit-font-smoothing: antialiased;
+  }
+  #root { width: fit-content; min-width: 1080px; margin: 0 auto; padding: 48px 48px 40px; background: #fff; }
+  .flow-title { font-size: 24px; font-weight: 700; color: var(--text); text-align: center; }
+  .flow-subtitle { font-size: 14px; color: var(--text-sub); text-align: center; margin-top: 8px; margin-bottom: 36px; }
+
+  .phase-group { background: #F8FAFC; border-radius: 12px; padding: 18px 22px 20px; }
+  .phase-title { font-size: 16px; font-weight: 700; padding: 9px 16px; border-radius: 8px; margin-bottom: 14px; }
+  .phase-steps { display: flex; gap: 14px; flex-wrap: wrap; }
+  .card {
+    background: #FFFFFF; border-radius: 10px; padding: 14px 16px; flex: 1 1 200px; min-width: 190px; max-width: 250px;
+    border: 1.5px solid #C7D2E0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .card .name { font-size: 15px; font-weight: 700; color: #1E3050; }
+  .card .desc { font-size: 12.5px; color: var(--text-sub); margin-top: 5px; line-height: 1.5; }
+  .card.ext { border: 1.5px dashed #94A3B8; background: #FBFCFD; }
+  .card.ext .name { color: #475569; }
+
+  /* Same-hue blue-gray layer progression */
+  .l1 .phase-title { background: #F0F4F8; color: #334155; border-left: 4px solid #64748B; }
+  .l2 .phase-title { background: #E8EDF2; color: #1E3A5F; border-left: 4px solid #5B7A99; }
+  .l3 .phase-title { background: #E0E7EF; color: #1E3050; border-left: 4px solid #4A6B8A; }
+  .l4 .phase-title { background: #D8E0EA; color: #172540; border-left: 4px solid #3A5C7A; }
+
+  .arrow-wrap { text-align: center; margin: 10px 0; }
+  .arrow-label { font-size: 12.5px; font-weight: 600; color: #475569; background: #F1F5F9; padding: 3px 12px; border-radius: 12px; }
+  .arrow { color: var(--connector); font-size: 22px; line-height: 1; margin-top: 4px; }
+
+  .flow-legend { display: flex; gap: 24px; justify-content: center; margin-top: 32px; padding: 12px 24px;
+    background: #F9FAFB; border-radius: 8px; border: 1px solid #E5E7EB; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4B5563; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; border: 2px solid #5B7A99; background: #E8EDF2; }
+  .legend-dot.extd { border: 2px dashed #94A3B8; background: #FBFCFD; }
+</style>
+</head>
+<body>
+<div id="root">
+  <div class="flow-title">Tugtugin Music App — System Architecture</div>
+  <div class="flow-subtitle">Native clients · custom Node API · local-first data · swappable catalog adapter</div>
+
+  <div class="phase-group l1">
+    <div class="phase-title">Client Layer — native apps</div>
+    <div class="phase-steps">
+      <div class="card"><div class="name">iOS App</div><div class="desc">Swift + SwiftUI · AVFoundation (AVQueuePlayer) · MPNowPlayingInfoCenter lock screen · SwiftData local DB</div></div>
+      <div class="card"><div class="name">Android App</div><div class="desc">Kotlin + Jetpack Compose · Media3 ExoPlayer · MediaSessionService (notification controls) · Room local DB</div></div>
+      <div class="card"><div class="name">Shared client modules</div><div class="desc">Download manager · LRC lyrics renderer (−0.5 s lead) · queue + shuffle model · offline cache</div></div>
+    </div>
+  </div>
+
+  <div class="arrow-wrap"><span class="arrow-label">HTTPS · REST /v1 · X-Device-Key</span><div class="arrow">&#8595;</div></div>
+
+  <div class="phase-group l2">
+    <div class="phase-title">API Layer — Express (Node 20)</div>
+    <div class="phase-steps">
+      <div class="card"><div class="name">REST /v1 (24 endpoints)</div><div class="desc">Zod validation · RFC 7807 errors · OpenAPI 3.1 spec</div></div>
+      <div class="card"><div class="name">Device auth</div><div class="desc">Keychain/Keystore-held device key · 60 req/min rate limit</div></div>
+      <div class="card"><div class="name">Stream gate</div><div class="desc">302 → signed 4 h TTL URLs · HMAC · not an open proxy</div></div>
+    </div>
+  </div>
+
+  <div class="arrow-wrap"><span class="arrow-label">internal service calls</span><div class="arrow">&#8595;</div></div>
+
+  <div class="phase-group l3">
+    <div class="phase-title">Service Layer</div>
+    <div class="phase-steps">
+      <div class="card"><div class="name">Catalog Service</div><div class="desc">ProviderAdapter interface · OwnCatalogProvider · YtmProvider (YouTube Music) · metadata cache 24 h</div></div>
+      <div class="card"><div class="name">Library Service</div><div class="desc">Playlists CRUD + reorder · likes · follows · recents</div></div>
+      <div class="card"><div class="name">Lyrics Service</div><div class="desc">LRC storage · LRCLIB lookup · per-user offset</div></div>
+      <div class="card"><div class="name">Sync Service</div><div class="desc">Local-first delta sync · offline listen replay</div></div>
+    </div>
+  </div>
+
+  <div class="arrow-wrap"><span class="arrow-label">reads / writes / resolves</span><div class="arrow">&#8595;</div></div>
+
+  <div class="phase-group l4">
+    <div class="phase-title">Data &amp; External Providers</div>
+    <div class="phase-steps">
+      <div class="card"><div class="name">PostgreSQL 16</div><div class="desc">Prisma ORM · 11 tables (devices, tracks, playlists…)</div></div>
+      <div class="card"><div class="name">Object Storage (R2)</div><div class="desc">Own-catalog audio · artwork · LRC files · zero egress</div></div>
+      <div class="card ext"><div class="name">YouTube / YT Music</div><div class="desc">External — streams + metadata via adapter (community flavor)</div></div>
+      <div class="card ext"><div class="name">LRCLIB</div><div class="desc">External — community synced lyrics lookup</div></div>
+    </div>
+  </div>
+
+  <div class="flow-legend">
+    <div class="legend-item"><div class="legend-dot"></div>Built and owned by this project</div>
+    <div class="legend-item"><div class="legend-dot extd"></div>External provider behind an adapter</div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --text: #111827; --text-sub: #6B7280; --connector: #94A3B8; }
+  body { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; background: #fff; color: var(--text); -webkit-font-smoothing: antialiased; }
+  #root { width: 700px; margin: 0 auto; padding: 20px 14px 16px; background: #fff; }
+  .flow-title { font-size: 22px; font-weight: 700; text-align: center; }
+  .flow-subtitle { font-size: 13.5px; color: var(--text-sub); text-align: center; margin-top: 6px; margin-bottom: 18px; }
+
+  .phase-group { background: #F8FAFC; border-radius: 10px; padding: 12px 14px 14px; }
+  .phase-title { font-size: 19px; font-weight: 700; padding: 8px 14px; border-radius: 7px; margin-bottom: 10px; }
+  .phase-steps { display: flex; gap: 10px; flex-wrap: wrap; }
+  .card { background: #FFFFFF; border-radius: 8px; padding: 10px 12px; flex: 1 1 200px; min-width: 195px;
+    border: 1.5px solid #C7D2E0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  .card .name { font-size: 16px; font-weight: 700; color: #1E3050; }
+  .card .desc { font-size: 13px; color: var(--text-sub); margin-top: 4px; line-height: 1.45; }
+  .card.ext { border: 1.5px dashed #94A3B8; background: #FBFCFD; }
+  .card.ext .name { color: #475569; }
+
+  .l1 .phase-title { background: #F0F4F8; color: #334155; border-left: 4px solid #64748B; }
+  .l2 .phase-title { background: #E8EDF2; color: #1E3A5F; border-left: 4px solid #5B7A99; }
+  .l3 .phase-title { background: #E0E7EF; color: #1E3050; border-left: 4px solid #4A6B8A; }
+  .l4 .phase-title { background: #D8E0EA; color: #172540; border-left: 4px solid #3A5C7A; }
+
+  .arrow-wrap { text-align: center; margin: 6px 0; }
+  .arrow-label { font-size: 13px; font-weight: 600; color: #475569; background: #F1F5F9; padding: 3px 12px; border-radius: 12px; }
+  .arrow { color: var(--connector); font-size: 20px; line-height: 1; margin-top: 3px; }
+</style>
+</head>
+<body>
+<div id="root">
+  <div class="flow-title">System Architecture</div>
+  <div class="flow-subtitle">Native clients &middot; custom Node API &middot; local-first data &middot; swappable catalog adapter</div>
+
+  <div class="phase-group l1">
+    <div class="phase-title">Client Layer &mdash; native apps</div>
+    <div class="phase-steps">
+      <div class="card"><div class="name">iOS App</div><div class="desc">Swift + SwiftUI &middot; AVQueuePlayer &middot; SwiftData</div></div>
+      <div class="card"><div class="name">Android App</div><div class="desc">Kotlin + Compose &middot; Media3 ExoPlayer &middot; Room</div></div>
+      <div class="card"><div class="name">Shared modules</div><div class="desc">Downloads &middot; LRC lyrics (&minus;0.5 s) &middot; queue</div></div>
+    </div>
+  </div>
+
+  <div class="arrow-wrap"><span class="arrow-label">HTTPS &middot; REST /v1 &middot; X-Device-Key</span><div class="arrow">&#8595;</div></div>
+
+  <div class="phase-group l2">
+    <div class="phase-title">API Layer &mdash; Express (Node 20)</div>
+    <div class="phase-steps">
+      <div class="card"><div class="name">24 REST endpoints</div><div class="desc">Zod validation &middot; OpenAPI 3.1</div></div>
+      <div class="card"><div class="name">Device auth</div><div class="desc">Keychain-held key &middot; 60 req/min limit</div></div>
+      <div class="card"><div class="name">Stream gate</div><div class="desc">302 &rarr; signed 4 h URLs &middot; HMAC</div></div>
+    </div>
+  </div>
+
+  <div class="arrow-wrap"><span class="arrow-label">internal service calls</span><div class="arrow">&#8595;</div></div>
+
+  <div class="phase-group l3">
+    <div class="phase-title">Service Layer</div>
+    <div class="phase-steps">
+      <div class="card"><div class="name">Catalog</div><div class="desc">ProviderAdapter: own catalog / YT Music</div></div>
+      <div class="card"><div class="name">Library</div><div class="desc">Playlists &middot; likes &middot; follows &middot; recents</div></div>
+      <div class="card"><div class="name">Lyrics</div><div class="desc">LRC store &middot; LRCLIB lookup &middot; offset</div></div>
+      <div class="card"><div class="name">Sync</div><div class="desc">Delta sync &middot; offline replay</div></div>
+    </div>
+  </div>
+
+  <div class="arrow-wrap"><span class="arrow-label">reads / writes / resolves</span><div class="arrow">&#8595;</div></div>
+
+  <div class="phase-group l4">
+    <div class="phase-title">Data &amp; External Providers</div>
+    <div class="phase-steps">
+      <div class="card"><div class="name">PostgreSQL 16</div><div class="desc">Prisma ORM &middot; 11 tables</div></div>
+      <div class="card"><div class="name">Object storage</div><div class="desc">Own-catalog audio &middot; art &middot; LRC</div></div>
+      <div class="card ext"><div class="name">YouTube / YT Music</div><div class="desc">External &mdash; via adapter</div></div>
+      <div class="card ext"><div class="name">LRCLIB</div><div class="desc">External &mdash; community lyrics</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

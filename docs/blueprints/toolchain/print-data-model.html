@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --text: #111827; --text-sub: #6B7280; --connector: #94A3B8; }
+  body { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; background: #fff; color: var(--text); -webkit-font-smoothing: antialiased; }
+  #root { width: 800px; margin: 0 auto; padding: 20px 14px 14px; background: #fff; }
+  .flow-title { font-size: 22px; font-weight: 700; text-align: center; }
+  .flow-subtitle { font-size: 13.5px; color: var(--text-sub); text-align: center; margin-top: 6px; margin-bottom: 18px; }
+
+  .er-grid { display: grid; grid-template-columns: 355px 355px; gap: 40px 60px; position: relative; justify-content: center; }
+  .entity { background: #FFFFFF; border: 1.5px solid #5B7A99; border-radius: 9px; overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); position: relative; z-index: 1; }
+  .entity .head { background: #E8EDF2; padding: 7px 12px; font-size: 16px; font-weight: 700; color: #1E3A5F;
+    border-bottom: 1.5px solid #C7D2E0; }
+  .entity .fields { padding: 6px 12px 8px; }
+  .entity .f { font-size: 14.5px; color: #374151; line-height: 1.55; }
+  .entity .f.pk { font-weight: 700; color: #1E3050; }
+  .entity .f.fk { color: #4A6B8A; }
+  .entity.user { border-color: #64748B; }
+  .entity.user .head { background: #F0F4F8; color: #334155; }
+  .entity.activity { border-color: #94A3B8; }
+  .entity.activity .head { background: #F1F5F9; color: #475569; }
+  .note-card { background: #FBFCFD; border: 1.5px dashed #94A3B8; border-radius: 9px; padding: 12px 14px;
+    font-size: 14px; color: #475569; line-height: 1.55; z-index: 1; position: relative; align-self: start; }
+  .note-card b { color: #334155; }
+  svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+  svg.wires path { stroke: #94A3B8; stroke-width: 2; fill: none; }
+  .card-label { font-size: 12.5px; font-weight: 600; fill: #475569; }
+  .lbl-bg { fill: #FFFFFF; }
+</style>
+</head>
+<body>
+<div id="root">
+  <div class="flow-title">Data Model &mdash; 11 Tables</div>
+  <div class="flow-subtitle">Core relations shown &middot; remaining links are foreign keys listed inside each card (pk = primary key, fk &rarr; = foreign key)</div>
+
+  <div class="er-grid" id="erGrid">
+    <svg class="wires" id="wires"></svg>
+    <!-- Column 1: user data -->
+    <div class="entity user" data-id="device" style="grid-row:1; grid-column:1;">
+      <div class="head">Device</div>
+      <div class="fields">
+        <div class="f pk">id (uuid, pk)</div>
+        <div class="f">display_name &middot; platform</div>
+        <div class="f">api_key_hash &middot; last_seen_at</div>
+      </div>
+    </div>
+    <div class="entity user" data-id="playlist" style="grid-row:2; grid-column:1;">
+      <div class="head">Playlist</div>
+      <div class="fields">
+        <div class="f pk">id (pk)</div>
+        <div class="f fk">device_id &#8594; Device</div>
+        <div class="f">name &middot; cover &middot; is_public &middot; sort</div>
+      </div>
+    </div>
+    <div class="entity user" data-id="playlisttrack" style="grid-row:3; grid-column:1;">
+      <div class="head">PlaylistTrack</div>
+      <div class="fields">
+        <div class="f pk">(playlist_id, position) pk</div>
+        <div class="f fk">track_id &#8594; Track</div>
+        <div class="f">added_at</div>
+      </div>
+    </div>
+    <div class="entity user" data-id="like" style="grid-row:4; grid-column:1;">
+      <div class="head">Like</div>
+      <div class="fields">
+        <div class="f pk">(device_id, track_id) pk</div>
+        <div class="f fk">device_id &#8594; Device &middot; track_id &#8594; Track</div>
+        <div class="f">liked_at</div>
+      </div>
+    </div>
+    <div class="entity activity" data-id="listenevent" style="grid-row:5; grid-column:1;">
+      <div class="head">ListenEvent</div>
+      <div class="fields">
+        <div class="f pk">id (pk)</div>
+        <div class="f fk">device_id &#8594; Device &middot; track_id &#8594; Track</div>
+        <div class="f">played_at &middot; ms_played</div>
+      </div>
+    </div>
+    <div class="entity activity" data-id="recentsearch" style="grid-row:6; grid-column:1;">
+      <div class="head">RecentSearch</div>
+      <div class="fields">
+        <div class="f pk">id (pk)</div>
+        <div class="f fk">device_id &#8594; Device</div>
+        <div class="f">query &middot; submitted_at &middot; result_type</div>
+      </div>
+    </div>
+
+    <!-- Column 2: catalog -->
+    <div class="entity" data-id="artist" style="grid-row:1; grid-column:2;">
+      <div class="head">Artist</div>
+      <div class="fields">
+        <div class="f pk">id (pk)</div>
+        <div class="f">name &middot; bio &middot; art_url &middot; verified</div>
+        <div class="f">source &middot; external_id</div>
+      </div>
+    </div>
+    <div class="entity" data-id="album" style="grid-row:2; grid-column:2;">
+      <div class="head">Album</div>
+      <div class="fields">
+        <div class="f pk">id (pk)</div>
+        <div class="f fk">artist_id &#8594; Artist</div>
+        <div class="f">title &middot; type &middot; release_date</div>
+      </div>
+    </div>
+    <div class="entity" data-id="track" style="grid-row:3; grid-column:2;">
+      <div class="head">Track</div>
+      <div class="fields">
+        <div class="f pk">id (pk)</div>
+        <div class="f fk">artist_id &#8594; Artist &middot; album_id &#8594; Album</div>
+        <div class="f">title &middot; duration_ms &middot; source &middot; has_lyrics</div>
+      </div>
+    </div>
+    <div class="entity" data-id="lyrics" style="grid-row:4; grid-column:2;">
+      <div class="head">Lyrics</div>
+      <div class="fields">
+        <div class="f pk fk">track_id (pk) &#8594; Track</div>
+        <div class="f">lrc_text &middot; plain_text &middot; synced</div>
+        <div class="f">offset_ms (default &minus;500) &middot; source</div>
+      </div>
+    </div>
+    <div class="entity activity" data-id="libraryitem" style="grid-row:5; grid-column:2;">
+      <div class="head">LibraryItem</div>
+      <div class="fields">
+        <div class="f pk">(device_id, item_type, item_id) pk</div>
+        <div class="f fk">device_id &#8594; Device</div>
+        <div class="f">item_type (artist/album/playlist) &middot; saved_at</div>
+      </div>
+    </div>
+    <div class="note-card" style="grid-row:6; grid-column:2;">
+      <b>No-login ownership.</b> Every user table keys on <b>device_id</b> &mdash; the device
+      registration replaces an account. Client DBs (SwiftData / Room) mirror their slice of this schema.
+    </div>
+  </div>
+</div>
+
+<script>
+  function anchor(el, side, offset, cRect) {
+    const r = el.getBoundingClientRect();
+    const x = r.left - cRect.left, y = r.top - cRect.top, w = r.width, h = r.height;
+    if (side === 'top')    return [x + w / 2 + (offset || 0), y];
+    if (side === 'bottom') return [x + w / 2 + (offset || 0), y + h];
+    if (side === 'left')   return [x, y + h / 2 + (offset || 0)];
+    if (side === 'right')  return [x + w, y + h / 2 + (offset || 0)];
+  }
+  function draw() {
+    const svg = document.getElementById('wires');
+    const grid = document.getElementById('erGrid');
+    const cRect = grid.getBoundingClientRect();
+    svg.setAttribute('width', cRect.width); svg.setAttribute('height', cRect.height);
+    svg.setAttribute('viewBox', '0 0 ' + cRect.width + ' ' + cRect.height);
+    const g = (id) => document.querySelector('[data-id="' + id + '"]');
+    const edges = [
+      ['device', 'bottom', 0, 'playlist', 'top', 0, '1:N'],
+      ['playlist', 'bottom', 0, 'playlisttrack', 'top', 0, '1:N'],
+      ['playlisttrack', 'right', 0, 'track', 'left', 0, 'N:1'],
+      ['artist', 'bottom', 0, 'album', 'top', 0, '1:N'],
+      ['album', 'bottom', 0, 'track', 'top', 0, '1:N'],
+      ['track', 'bottom', 0, 'lyrics', 'top', 0, '1:1']
+    ];
+    edges.forEach(function (e) {
+      const [fi, fs, fo, ti, ts, to, label] = e;
+      const p1 = anchor(g(fi), fs, fo, cRect);
+      const p2 = anchor(g(ti), ts, to, cRect);
+      let d, lx, ly;
+      if (fs === 'bottom' && ts === 'top') {
+        d = 'M ' + p1[0] + ' ' + p1[1] + ' L ' + p2[0] + ' ' + p2[1];
+        lx = p1[0]; ly = p1[1] + (p2[1] - p1[1]) * 0.5;
+      } else {
+        d = 'M ' + p1[0] + ' ' + p1[1] + ' L ' + p2[0] + ' ' + p2[1];
+        lx = p1[0] + (p2[0] - p1[0]) * 0.5; ly = p1[1];
+      }
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d); svg.appendChild(path);
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', lx); t.setAttribute('y', ly - 5); t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('class', 'card-label'); t.textContent = label;
+      const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const w = label.length * 8 + 8;
+      bg.setAttribute('x', lx - w / 2); bg.setAttribute('y', ly - 18);
+      bg.setAttribute('width', w); bg.setAttribute('height', 15); bg.setAttribute('class', 'lbl-bg');
+      svg.appendChild(bg); svg.appendChild(t);
+    });
+  }
+  window.addEventListener('load', function () { setTimeout(draw, 100); });
+</script>
+</body>
+</html>
