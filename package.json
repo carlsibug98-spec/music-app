@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Resona — private music streaming app. Native iOS + Android clients, zero-cost Node.js backend.",
+  "license": "MIT",
   "type": "module",
   "workspaces": [
     "server",

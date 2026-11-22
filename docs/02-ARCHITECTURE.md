@@ -197,7 +197,7 @@ All requests carry `X-Device-Key` (issued once at registration). Errors use RFC 
 | `GET /v1/artists/:id/similar` | Similar artists (taste-space neighbors) (M5) |
 | `GET /v1/me/state` | Current listener state + signal summary (M5) |
 
-OpenAPI 3.1 spec is an M0 deliverable (single source of truth for `packages/api-types`). The five personalization endpoints land in M5 together with the nightly scoring job (D-011); the OpenAPI skeleton gains them then — the core 24 stay as shipped in M0.
+OpenAPI 3.1 spec is an M0 deliverable (single source of truth for `packages/api-types`). All 29 contracts are declared now; the five personalization endpoints are implemented in M5 together with the nightly scoring job (D-011), while the core 24 ship in M0.
 
 ## 9. Sync strategy (no-login, local-first)
 
