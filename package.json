@@ -19,5 +19,9 @@
     "build": "npm run build -w server",
     "tokens": "npm run generate -w @resona/design-tokens",
     "test:tracks": "node server/scripts/make-test-tracks.mjs"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "esbuild@0.21.5": true
   }
 }

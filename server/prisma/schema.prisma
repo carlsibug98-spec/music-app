@@ -1,0 +1,223 @@
+// Resona — Prisma schema v1 (M0)
+// Spec: docs/02-ARCHITECTURE.md §7 (11 tables).
+// The 5 derived personalization tables (artist affinity, similarity,
+// track velocity, chart snapshots, home shelf state — blueprint Ch. 8)
+// land with the M5 nightly job; core tables below carry the signals
+// (ListenEvent.ms_played/.completed) they will consume.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/* ---------- Enums ---------- */
+
+enum Platform {
+  ios
+  android
+}
+
+enum CatalogSource {
+  own // admin-uploaded, object storage
+  ytm // resolved via the YouTube Music adapter (M2+)
+}
+
+enum ReleaseType {
+  album
+  single
+  ep
+}
+
+enum LibraryItemType {
+  artist
+  album
+  playlist
+}
+
+/* ---------- Identity (no login — P1) ---------- */
+
+model Device {
+  id          String    @id @default(uuid()) @db.Uuid
+  displayName String    @map("display_name")
+  platform    Platform
+  apiKeyHash  String    @unique @map("api_key_hash") // sha256 of the X-Device-Key
+  createdAt   DateTime  @default(now()) @map("created_at")
+  lastSeenAt  DateTime? @map("last_seen_at")
+
+  playlists      Playlist[]
+  likes          Like[]
+  libraryItems   LibraryItem[]
+  listenEvents   ListenEvent[]
+  recentSearches RecentSearch[]
+
+  @@map("devices")
+}
+
+/* ---------- Catalog ---------- */
+
+model Artist {
+  id         String        @id @default(uuid()) @db.Uuid
+  name       String
+  bio        String?
+  artUrl     String?       @map("art_url")
+  isVerified Boolean       @default(false) @map("is_verified")
+  source     CatalogSource
+  externalId String?       @map("external_id")
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  albums  Album[]
+  tracks  Track[]
+
+  @@unique([source, externalId])
+  @@index([name])
+  @@map("artists")
+}
+
+model Album {
+  id          String      @id @default(uuid()) @db.Uuid
+  title       String
+  artistId    String      @map("artist_id") @db.Uuid
+  type        ReleaseType @default(album)
+  releaseDate DateTime?   @map("release_date") @db.Date
+  artUrl      String?     @map("art_url")
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  artist Artist  @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  tracks Track[]
+
+  @@index([artistId])
+  @@map("albums")
+}
+
+model Track {
+  id         String        @id @default(uuid()) @db.Uuid
+  title      String
+  artistId   String        @map("artist_id") @db.Uuid
+  albumId    String?       @map("album_id") @db.Uuid
+  durationMs Int           @map("duration_ms")
+  hasLyrics  Boolean       @default(false) @map("has_lyrics")
+  playCount  Int           @default(0) @map("play_count")
+  source     CatalogSource
+  externalId String?       @map("external_id")
+  explicit   Boolean       @default(false)
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  artist        Artist          @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  album         Album?          @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  lyrics        Lyrics?
+  playlistItems PlaylistTrack[]
+  likes         Like[]
+  listenEvents  ListenEvent[]
+
+  @@unique([source, externalId])
+  @@index([artistId])
+  @@index([albumId])
+  @@index([playCount])
+  @@map("tracks")
+}
+
+model Lyrics {
+  trackId   String  @id @map("track_id") @db.Uuid
+  lrcText   String? @map("lrc_text") // timed lines: [mm:ss.xx] text
+  plainText String? @map("plain_text")
+  offsetMs  Int     @default(-500) @map("offset_ms") // P4: lead audio by 0.5 s
+  synced    Boolean @default(false)
+  source    String  @default("unknown") // own | lrclib | user
+
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@map("lyrics")
+}
+
+/* ---------- Library (device-owned data) ---------- */
+
+model Playlist {
+  id          String   @id @default(uuid()) @db.Uuid
+  deviceId    String   @map("device_id") @db.Uuid
+  name        String
+  description String?
+  coverUrl    String?  @map("cover_url")
+  isPublic    Boolean  @default(false) @map("is_public")
+  sortOrder   String   @default("recent") // recent | custom | title
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  device Device         @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  items  PlaylistTrack[]
+
+  @@index([deviceId])
+  @@map("playlists")
+}
+
+model PlaylistTrack {
+  playlistId String   @map("playlist_id") @db.Uuid
+  position   Int // gaps of 10 for cheap reorder (doc 02 §7)
+  trackId    String   @map("track_id") @db.Uuid
+  addedAt    DateTime @default(now()) @map("added_at")
+
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  track    Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@id([playlistId, position])
+  @@index([trackId])
+  @@map("playlist_tracks")
+}
+
+model Like {
+  deviceId String   @map("device_id") @db.Uuid
+  trackId  String   @map("track_id") @db.Uuid
+  likedAt  DateTime @default(now()) @map("liked_at")
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  track  Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@id([deviceId, trackId])
+  @@map("likes")
+}
+
+model LibraryItem {
+  deviceId String         @map("device_id") @db.Uuid
+  itemType LibraryItemType @map("item_type")
+  itemId   String         @map("item_id") @db.Uuid
+  savedAt  DateTime       @default(now()) @map("saved_at")
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@id([deviceId, itemType, itemId])
+  @@map("library_items")
+}
+
+/* ---------- Signals (feeds personalization in M5) ---------- */
+
+model ListenEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  deviceId  String   @map("device_id") @db.Uuid
+  trackId   String   @map("track_id") @db.Uuid
+  playedAt  DateTime @default(now()) @map("played_at")
+  msPlayed  Int      @map("ms_played")
+  completed Boolean  @default(false) // >= 90% played → counts toward affinity (Ch. 8)
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  track  Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId, playedAt])
+  @@index([trackId, playedAt])
+  @@map("listen_events")
+}
+
+model RecentSearch {
+  id          String   @id @default(uuid()) @db.Uuid
+  deviceId    String   @map("device_id") @db.Uuid
+  query       String
+  submittedAt DateTime @default(now()) @map("submitted_at")
+  resultType  String?  @map("result_type") // track | album | artist | playlist
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId, submittedAt])
+  @@map("recent_searches")
+}
