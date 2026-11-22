@@ -13,6 +13,7 @@ server/.env
 
 # Local media (own-catalog test tracks — never committed)
 local-media/*
+!local-media/README.md
 
 # Android
 .gradle/

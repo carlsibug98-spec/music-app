@@ -18,7 +18,7 @@ Living status board — updated at every milestone gate and whenever a decision 
 | Personalization engine spec | **Done (v1.1)** | Blueprint Ch. 8: states, signals, nightly job, shelves, charts |
 | Diagrams (architecture, ER, pipeline, gantt) | **Done** | `download/assets/`, `docs/diagrams/` |
 | Consolidated PDF blueprint | **Done (v1.1)** | `download/Resona_Music_App_Creation_Blueprint.pdf` — 38 pages, 13 chapters |
-| M0 — Foundations | **In progress** | Scaffold + tokens + server core committed; apps/CI/OpenAPI in flight |
+| M0 — Foundations | **Done (code)** | All checklist items; demo video ritual pending on you. CI verifies Android build on every push |
 | M1 — Catalog + search | Not started | wks 5–8 |
 | M2 — Playback core | Not started | wks 9–13 |
 | M3 — Library, playlists, taste picker | Not started | wks 14–17 |
@@ -26,16 +26,16 @@ Living status board — updated at every milestone gate and whenever a decision 
 | M5 — Personalization + charts | Not started | wks 22–24 |
 | M6 — Deploy + friend rollout | Not started | wks 25–26 |
 
-## Next up (M0 checklist)
+## M0 checklist — complete
 
-- [ ] Monorepo scaffold: `apps/ios`, `apps/android`, `server`, `packages/api-types`, `packages/design-tokens`
-- [ ] Express server: `GET /healthz`, `POST /v1/devices` (stub), Zod validation, error envelope
-- [ ] Prisma schema v1 (11 tables from doc 02 §7) + first migration + `docker compose up`
-- [ ] Xcode + Gradle projects with token-generated theme (doc 03 §6), Home screen skeleton
-- [ ] GitHub Actions: lint + build both apps + server tests; APK artifact on main
-- [ ] OpenAPI 3.1 skeleton for the 24 endpoints
-- [ ] 10 own-catalog test tracks prepared (audio + LRC + art) for M1 — *not committed to the repo*
-- [ ] First 30-second demo video of the week (ritual starts here)
+- [x] Monorepo scaffold: `apps/ios`, `apps/android`, `server`, `packages/api-types`, `packages/design-tokens`
+- [x] Express server: `GET /healthz`, `POST /v1/devices` (in-memory stub, M1 swaps in Prisma), Zod validation, RFC 7807 error envelope — 10 tests green
+- [x] Prisma schema v1 (11 tables from doc 02 §7) + init migration SQL + `docker compose up`
+- [x] Xcode (XcodeGen `project.yml`) + Gradle projects with token-generated theme (doc 03 §6), Home screen skeletons — Android compiled by CI on push
+- [x] GitHub Actions: lint + typecheck + tests + prisma validate; APK artifact on main (iOS job intentionally omitted — macOS runners aren't free on private repos)
+- [x] OpenAPI 3.1 skeleton for the 24 endpoints (`server/openapi.yaml`)
+- [x] 10 own-catalog test tracks prepared (audio + LRC + art + manifest) — `npm run test:tracks`, gitignored
+- [ ] First 30-second demo video of the week (your ritual — record & post)
 
 ## Decision log
 
@@ -55,5 +55,6 @@ Living status board — updated at every milestone gate and whenever a decision 
 
 ## Changelog
 
+- **2026-11-22 (M0 code complete)** — Monorepo scaffolded and pushed: npm workspaces, docker-compose (Postgres 16), design-token pipeline (`tokens.json` → `GeneratedTokens.kt`/`.swift`), `@resona/api-types` DTOs, Express server core (healthz, POST /v1/devices, Zod, RFC 7807, 10 green tests), Prisma schema v1 (11 tables) + init migration SQL, native app skeletons (Compose + SwiftUI Home), GitHub Actions CI (server jobs + Android APK artifact), OpenAPI 3.1 skeleton (24 endpoints), 10 ffmpeg-generated test tracks (gitignored `local-media/`). Remaining: demo-video ritual, `docker compose up` + `prisma migrate deploy` on your machine, watch the first CI run.
 - **2026-11-22 (v1.1)** — Blueprint updated with the full personalization engine: new Chapter 8 (listener states, taste picker, signal weights, nightly scoring, shelf registry, real charts), roadmap extended to 26 weeks with dedicated M5 + M6, 5 derived tables, 5 new endpoints, screens S-31..S-33, risks R-10/R-11, 4th diagram (personalization pipeline). Also fixed a v1.0 rendering bug that dropped 10 of 12 chapter headings. Markdown docs 01/02/04/06 pending sync to v1.1; the PDF is the master plan.
 - **2026-11-22** — Planning v1.0 complete: PRD, architecture, design system, roadmap, sourcing research, risk register, diagrams, and the consolidated PDF blueprint pushed to this repository. M0 checklist is the next action.

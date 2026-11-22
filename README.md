@@ -8,7 +8,23 @@ You open it, type your name once, and start listening. No account, no email, no 
 
 ## Status
 
-**Phase: planning complete — M0 (Foundations) is the next milestone.** The plan turns the 25-screen interactive mockup in `design/reference-mockup.html` into a 28-week solo build. See `docs/04-ROADMAP.md`.
+**Phase: M0 (Foundations) — code complete.** Scaffold, design-token pipeline, server core, both app skeletons, CI, and OpenAPI are in. See `PROGRESS.md`. Master plan: `docs/blueprints/` (38-page PDF, 26 weeks, M0–M6).
+
+## Quick start
+
+```bash
+npm install                      # all workspaces
+docker compose up -d             # Postgres 16 on :5432
+cp server/.env.example server/.env
+npm run dev                      # API on :3000
+curl localhost:3000/healthz
+
+npm test -w @resona/server       # 10 tests
+npm run tokens                   # regenerate Kotlin+Swift tokens
+npm run test:tracks              # 10 seed tracks -> local-media/ (ffmpeg)
+```
+
+Android: open `apps/android` in Android Studio. iOS: `cd apps/ios && xcodegen generate`, open `Resona.xcodeproj`.
 
 ## Repository map
 
@@ -21,8 +37,12 @@ You open it, type your name once, and start listening. No account, no email, no 
 | `docs/04-ROADMAP.md` | Milestones M0–M5, week by week, solo part-time |
 | `docs/05-RESEARCH.md` | How OpenSpot/Musify source music, and the honest legal/distribution analysis |
 | `docs/06-RISK-REGISTER.md` | 12 scored risks with mitigations and triggers |
-| `docs/diagrams/` | Architecture, data-model, and roadmap diagrams |
+| `docs/diagrams/` | Architecture, data-model, personalization-pipeline, and roadmap diagrams |
 | `docs/blueprints/` | The consolidated PDF creation blueprint |
+| `apps/ios` · `apps/android` | Native clients (SwiftUI · Compose) |
+| `server/` | Node API: Express + Zod + Prisma, `openapi.yaml` |
+| `packages/` | `design-tokens` (JSON → Kotlin/Swift), `api-types` (shared DTOs) |
+| `local-media/` | Regenerated test tracks (gitignored) |
 
 ## The five fixed principles
 
