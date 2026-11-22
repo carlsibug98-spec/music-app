@@ -2,6 +2,7 @@
   "name": "@resona/design-tokens",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "Midnight Leaf design tokens — single source of truth, generates Kotlin + Swift constants",
   "scripts": {

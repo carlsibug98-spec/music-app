@@ -14,8 +14,9 @@
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const OUT = new URL('../../local-media/', import.meta.url).pathname;
+const OUT = fileURLToPath(new URL('../../local-media/', import.meta.url));
 mkdirSync(OUT, { recursive: true });
 
 // Tone per track: pentatonic ladder so consecutive tracks sound related.

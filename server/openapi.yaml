@@ -5,10 +5,12 @@ info:
   description: |
     Private music streaming API (no login — device-key auth, blueprint Ch. 5).
 
-    M0 skeleton: all 24 v1 endpoints are declared; /healthz and
-    /v1/devices are implemented and fully specified. Others carry their
-    contracts (request/response shapes) and are implemented in M1–M5 as
-    the roadmap dictates. Keep this file and @resona/api-types in sync.
+    M0 skeleton: all 29 v1 endpoint contracts are declared (28 paths;
+    likes and library each combine PUT/DELETE into one contract row);
+    /healthz and /v1/devices are implemented and fully specified. Others
+    carry their contracts (request/response shapes) and are implemented in
+    M1–M5 as the roadmap dictates. Keep this file and @resona/api-types in
+    sync.
 servers:
   - url: http://localhost:3000
     description: local dev
@@ -25,6 +27,8 @@ tags:
   - name: playlists
   - name: library
   - name: signals
+  - name: personalization
+  - name: charts
 
 paths:
   /healthz:
@@ -65,6 +69,33 @@ paths:
       summary: Personalized home sections (shelf contracts — blueprint Ch. 8)
       responses:
         "200": { description: Shelf payload (M5) }
+
+  /v1/me/taste:
+    post:
+      tags: [personalization]
+      summary: Taste picker submit {artist_ids[]} (≥ 3) — seeds TasteProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [artist_ids]
+              properties:
+                artist_ids:
+                  type: array
+                  minItems: 3
+                  maxItems: 20
+                  items: { type: string, format: uuid }
+      responses:
+        "204": { description: Taste profile seeded (M3) }
+
+  /v1/home/shelves:
+    get:
+      tags: [personalization]
+      summary: Adaptive home — ordered shelves + payloads for the listener state
+      responses:
+        "200": { description: Shelf set (M5) }
 
   /v1/search/suggest:
     get:
@@ -142,6 +173,14 @@ paths:
       responses:
         "200": { description: Artist detail (M1) }
 
+  /v1/artists/{id}/similar:
+    get:
+      tags: [personalization]
+      summary: Similar artists from taste-space neighbors, top 10, seed excluded
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Similar artists (M5) }
+
   /v1/albums/{id}:
     get:
       tags: [catalog]
@@ -149,6 +188,23 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
         "200": { description: Album detail (M1) }
+
+  /v1/charts:
+    get:
+      tags: [charts]
+      summary: Global or personal Top 50 snapshot — rank, movement, deduplicated plays
+      parameters:
+        - { name: scope, in: query, schema: { type: string, enum: [global, personal] } }
+        - { name: window, in: query, schema: { type: string, enum: [day, week] } }
+      responses:
+        "200": { description: Chart snapshot (M5) }
+
+  /v1/me/state:
+    get:
+      tags: [personalization]
+      summary: Current listener state (new / casual / regular / super-fan) + signal summary
+      responses:
+        "200": { description: Listener state (M5) }
 
   /v1/playlists:
     get:

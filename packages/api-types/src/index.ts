@@ -89,3 +89,65 @@ export interface ArtistSummary {
   art_url?: string | null;
   is_verified: boolean;
 }
+
+/* ---------- Personalization (M3/M5 — shapes agreed now) ---------- */
+
+export interface TasteRequest {
+  /** 3–20 loved artist ids; the picker recommends ≥ 3. */
+  artist_ids: UUID[];
+}
+
+/** Shelf registry (blueprint v1.1 §4.2): five server-assembled shelves. */
+export type ShelfKey =
+  | 'recent_rotation'
+  | 'because_you_listened'
+  | 'similar_artists'
+  | 'rising_opm'
+  | 'your_top_50';
+
+export interface HomeShelf {
+  key: ShelfKey;
+  rank: number;
+  /** Human-readable explanation shown in the UI (e.g. "Because you listened to Bakunawa"). */
+  reason: string;
+  item_ids: UUID[];
+  /** Client-local hide preference; the server still returns the shelf. */
+  hidden?: boolean;
+}
+
+export interface HomeShelvesResponse {
+  shelves: HomeShelf[];
+}
+
+export interface SimilarArtist {
+  artist: ArtistSummary;
+  /** Taste-space affinity (0–1); top 10, seed artist excluded. */
+  affinity: number;
+}
+
+export type ListenerStateName = 'new' | 'casual' | 'regular' | 'super-fan';
+
+export interface ListenerState {
+  state: ListenerStateName;
+  /** Signal summary used by the rules-based scorer (plays, skips, completions, likes, recency). */
+  signals: Record<string, number>;
+  entered_at: ISODateString;
+}
+
+export type ChartScope = 'global' | 'personal';
+
+export interface ChartEntry {
+  rank: number;
+  /** Prior rank − current rank; 0 = new entry. */
+  movement: number;
+  track: TrackSummary;
+  /** Deduplicated plays (one per device/track/day) in the snapshot window. */
+  plays: number;
+}
+
+export interface ChartResponse {
+  scope: ChartScope;
+  window: 'day' | 'week';
+  window_start: ISODateString;
+  entries: ChartEntry[];
+}
