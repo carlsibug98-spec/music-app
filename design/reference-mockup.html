@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mockup: UI from screen recording</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#121212;
+  --black:#000;
+  --card:#1f1f1f;
+  --card2:#282828;
+  --chip:#2a2a2a;
+  --line:#2f2f2f;
+  --text:#ffffff;
+  --sub:#b3b3b3;
+  --dim:#7f7f7f;
+  --green:#1ed760;
+  --red:#f15e6c;
+  --mini:#4a1f16;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050505;color:var(--text);font-family:Figtree,"Helvetica Neue",Arial,system-ui,sans-serif;min-height:100vh;display:flex;flex-wrap:wrap;gap:56px;align-items:center;justify-content:center;padding:32px}
+button,input{font-family:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;transition:transform 160ms cubic-bezier(.23,1,.32,1),background-color 160ms ease,color 160ms ease,opacity 160ms ease}
+button:active{transform:scale(.97)}
+.ib{position:relative}
+.ib::after{content:'';position:absolute;inset:-4px;border-radius:50%}
+.screen.enter>*{animation:rise 240ms cubic-bezier(.23,1,.32,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Notes */
+.notes{max-width:300px}
+.notes h3{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+.notes ol{padding-left:18px;color:var(--sub);font-size:14px;line-height:1.6}
+.notes li{margin-bottom:10px}
+.notes b{color:var(--text)}
+
+/* Device */
+.device{width:390px;height:844px;background:var(--bg);border-radius:46px;overflow:hidden;position:relative;border:10px solid #1b1b1b;box-shadow:0 40px 90px rgba(0,0,0,.7)}
+.status{position:absolute;top:0;left:0;right:0;height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;font-size:14px;font-weight:600;z-index:40}
+.screen{position:absolute;top:44px;bottom:0;left:0;right:0;overflow-y:auto;padding:0 14px 150px;scrollbar-width:none}
+.screen::-webkit-scrollbar,.overlay::-webkit-scrollbar{display:none}
+
+/* Icons */
+.svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.svg.fill{fill:currentColor;stroke:none}
+.svg.check-ic{width:20px;height:20px}
+
+/* Type */
+.h1{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.h2{font-size:22px;font-weight:700;letter-spacing:-.01em;margin:24px 0 12px;display:flex;justify-content:space-between;align-items:center}
+.label{font-size:12px;color:var(--sub)}
+.sub{color:var(--sub);font-size:14px}
+.green{color:var(--green)}
+.red{color:var(--red)}
+
+/* Top bar */
+.top{display:flex;align-items:center;justify-content:space-between;height:52px;gap:8px}
+.ib{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--text);flex-shrink:0}
+.ib.dark{background:rgba(0,0,0,.45)}
+.ib.plain{width:auto}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ffb36b,#d6553a);display:grid;place-items:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+
+/* Chips */
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:6px 0 10px}
+.chips::-webkit-scrollbar{display:none}
+.chip{height:32px;padding:0 13px;border-radius:16px;background:var(--chip);color:var(--text);font-size:14px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.chip.on{background:var(--green);color:#000}
+.chip.out{background:none;border:1px solid #6a6a6a}
+.chip.sm{height:28px;font-size:13px;padding:0 11px}
+
+/* Quick grid (Home) */
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.qcard{display:flex;align-items:center;gap:10px;background:var(--chip);border-radius:6px;height:56px;overflow:hidden;text-align:left;font-size:13px;font-weight:700;color:var(--text)}
+.qcard .thumb{width:56px;height:56px;flex-shrink:0}
+.qcard span{line-height:1.2;padding-right:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* Track rows */
+.trow{display:flex;align-items:center;gap:12px;padding:8px 0;min-height:64px;cursor:pointer;width:100%;text-align:left;background:none}
+.trow .meta{flex:1;min-width:0}
+.t{font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.t.grn{color:var(--green)}
+.s{font-size:14px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.trow .act{display:flex;align-items:center;gap:14px;color:var(--sub)}
+.rnd{width:48px;height:48px;border-radius:4px;flex-shrink:0;display:grid;place-items:center;font-size:16px;font-weight:800;color:#fff;overflow:hidden;position:relative}
+.rnd.c{border-radius:50%}
+.rnd.big{width:56px;height:56px}
+.rnd::after{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.14),transparent 50%)}
+.rnd>*{position:relative;z-index:1}
+.eq{display:inline-flex;gap:2px;align-items:flex-end;height:12px}
+.eq i{width:3px;background:var(--green);display:block}
+.eq i:nth-child(1){height:6px}.eq i:nth-child(2){height:12px}.eq i:nth-child(3){height:8px}
+
+/* Section and cards */
+.hscroll{display:flex;gap:14px;overflow-x:auto;margin:0 -14px;padding:0 14px;scrollbar-width:none}
+.hscroll::-webkit-scrollbar{display:none}
+.genres{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.genre{display:flex;align-items:flex-end;justify-content:flex-start;position:relative;overflow:hidden;min-width:0;width:100%;height:86px;padding:12px 14px;border:0;border-radius:10px;color:#fff;font-size:16px;font-weight:700;text-align:left;white-space:nowrap;text-overflow:ellipsis}
+.genre::after{content:'';position:absolute;right:-14px;top:-14px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.14)}
+.jcard{width:150px;flex-shrink:0;text-align:left}
+.jcard .t,.jcard .sub,.card-t,.card-s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.card-t{font-size:15px;font-weight:600;color:var(--text)}
+.card-s{font-size:13px;color:var(--sub);margin-top:2px}
+.jcard .art{width:150px;height:150px;border-radius:6px;margin-bottom:10px;position:relative;overflow:hidden}
+.jcard .art.round{border-radius:50%}
+.jcard .t{font-size:15px}
+.grp{display:flex;align-items:center;justify-content:space-between;margin:20px 0 12px}
+.grp h2{margin:0;font-size:22px}
+.link-g{color:var(--green);font-size:14px;font-weight:600;background:none;border:0;white-space:nowrap;flex-shrink:0;margin-left:12px}
+
+/* Buttons */
+.pill{height:32px;padding:0 14px;border-radius:16px;border:1px solid #6a6a6a;background:none;color:var(--text);font-size:14px;font-weight:600;white-space:nowrap}
+.pill.solid{background:var(--text);color:#000;border-color:var(--text)}
+.pill.follow{height:30px;padding:0 16px}
+.green-btn{height:44px;padding:0 22px;border-radius:22px;background:var(--green);color:#000;font-weight:700;font-size:15px;border:0}
+.play-g{width:56px;height:56px;border-radius:50%;background:var(--green);display:grid;place-items:center;color:#000;flex-shrink:0}
+.play-g .svg{width:24px;height:24px}
+.row-btns{display:flex;align-items:center;gap:18px;margin:14px 0}
+.row-btns .sp{flex:1}
+.gap-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:6px -14px 0;padding:0 14px}
+.gap-chips::-webkit-scrollbar{display:none}
+
+/* Bottom: mini player and nav */
+.mini{position:absolute;left:8px;right:8px;bottom:66px;height:56px;background:var(--mini);border-radius:8px;display:flex;align-items:center;gap:10px;padding:0 8px 0 6px;cursor:pointer;z-index:12;overflow:hidden}
+.mini .bar{position:absolute;left:0;right:0;top:0;height:2px;background:rgba(255,255,255,.2)}
+.mini .bar i{display:block;height:100%;background:#fff}
+.mini .meta{flex:1;min-width:0}
+.mini .t{font-size:14px}
+.mini .s{font-size:12px}
+.nav{position:absolute;left:0;right:0;bottom:0;height:64px;background:var(--black);display:flex;align-items:center;justify-content:space-around;z-index:12;padding:0 4px 4px}
+.nav button{flex:1;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--dim);font-size:11px;font-weight:600;position:relative}
+.nav button.on{color:var(--text)}
+.nav .dot{position:absolute;top:8px;right:calc(50% - 16px);width:6px;height:6px;border-radius:50%;background:#3b8dff}
+.nav .svg{width:24px;height:24px}
+
+/* Overlays */
+.overlay{position:absolute;inset:0;z-index:30;background:var(--bg);transform:translateY(102%);transition:transform 380ms cubic-bezier(.32,.72,0,1);overflow-y:auto;padding:44px 20px 30px;scrollbar-width:none}
+.overlay.open{transform:none}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:34;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card2);border-radius:12px 12px 0 0;max-height:84%;transform:translateY(105%);transition:transform 320ms cubic-bezier(.32,.72,0,1);z-index:35;overflow-y:auto;padding:10px 16px 26px;scrollbar-width:none}
+.sheet.open{transform:none}
+.grab{width:40px;height:4px;background:#6a6a6a;border-radius:3px;margin:0 auto 14px}
+.mrow{display:flex;align-items:center;gap:18px;height:50px;width:100%;text-align:left;font-size:15px;color:var(--text)}
+.mrow .svg{width:22px;height:22px;color:var(--text)}
+.mrow .pre{margin-left:auto;color:var(--green);font-size:12px;font-weight:700}
+.mrow .pre.gray{color:var(--sub)}
+.drawer{position:absolute;top:0;bottom:0;left:0;width:88%;background:var(--bg);z-index:36;transform:translateX(-104%);transition:transform .32s cubic-bezier(.2,.8,.2,1);overflow-y:auto;padding:52px 16px 30px;scrollbar-width:none}
+.drawer.open{transform:none}
+.dialog{position:absolute;left:24px;right:24px;top:50%;transform:translateY(-50%) scale(.96);opacity:0;pointer-events:none;background:var(--card2);border-radius:10px;padding:26px 22px 18px;z-index:37;transition:.25s;text-align:center}
+.dialog.open{opacity:1;pointer-events:auto;transform:translateY(-50%) scale(1)}
+.dialog input{width:100%;background:none;border:0;border-bottom:2px solid var(--green);font-size:24px;font-weight:800;text-align:center;padding:6px 0;outline:none;color:var(--text);margin:14px 0 22px}
+.dialog .btns{display:flex;justify-content:flex-end;gap:10px}
+.toast{position:absolute;left:14px;right:14px;bottom:132px;background:#fff;color:#000;border-radius:8px;padding:13px 16px;font-size:14px;z-index:38;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.open{opacity:1}
+.toggle{width:44px;height:26px;border-radius:99px;background:#535353;position:relative;flex-shrink:0;margin-left:auto}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on{background:var(--green)}
+.toggle.on::after{left:21px}
+
+/* Now playing */
+.np-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.np-top .center{text-align:center}
+.np-top .t{font-size:13px}
+.np-art{width:100%;aspect-ratio:1;border-radius:8px;display:grid;place-items:center;color:#fff;font-size:88px;font-weight:800;position:relative;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.np-art::after{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.16),transparent 55%)}
+.np-title{display:flex;align-items:center;justify-content:space-between;margin-top:22px}
+.np-title .big{font-size:22px;font-weight:700}
+.np-prog{margin-top:18px}
+.track{height:4px;background:rgba(255,255,255,.22);border-radius:3px;position:relative}
+.track .fill{height:100%;background:#fff;border-radius:3px}
+.times{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:8px}
+.ctrl{display:flex;align-items:center;justify-content:space-between;margin:14px 0 6px}
+.ctrl .side{width:44px;height:44px;display:grid;place-items:center;color:var(--text)}
+.ctrl .side.muted{color:var(--sub)}
+.ctrl .big{width:64px;height:64px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center}
+.ctrl .big .svg{width:26px;height:26px}
+.np-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.np-title .svg{width:17px;height:17px}
+.lyr-card{margin-top:22px;border-radius:10px;background:rgba(0,0,0,.28);padding:16px;position:relative;overflow:hidden}
+.lyr-card .hd{font-size:14px;font-weight:800;margin-bottom:10px}
+.lyr-card p{font-size:17px;font-weight:700;margin:6px 0;line-height:1.3;color:rgba(255,255,255,.92)}
+.lyr-card .pill{margin-top:10px;background:#fff;color:#000;border:0}
+.lyrics-full{background:transparent;margin:-44px -20px 0;padding:56px 22px 24px;min-height:100%}
+.lf-line{font-size:24px;font-weight:800;line-height:1.25;color:rgba(255,255,255,.5);padding:6px 0;cursor:pointer;letter-spacing:-.01em}
+.lf-line.on{color:#fff}
+.lf-line.past{color:#fff}
+.lf-line.instr{color:#fff;opacity:.6;font-size:14px;letter-spacing:.2em}
+.lf-bottom{padding-top:20px}
+
+/* Settings */
+.stiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stile{background:var(--card);border-radius:10px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px}
+.stile .svg{width:22px;height:22px;color:var(--sub)}
+.stile .t{font-size:15px;font-weight:600}
+.stile .s{font-size:13px}
+.srow{display:flex;align-items:center;gap:16px;padding:12px 0;width:100%;text-align:left}
+.srow .meta{flex:1}
+.srow .t{font-size:16px;white-space:normal}
+.srow .s{white-space:normal}
+.srow .svg{color:var(--text)}
+.srow .chev{color:var(--sub);width:18px;height:18px}
+.card-row{background:var(--card);border-radius:10px;padding:14px;display:flex;align-items:center;gap:14px}
+.logout{width:100%;height:46px;border-radius:23px;border:1px solid #444;background:none;color:var(--text);font-size:15px;font-weight:700;margin-top:24px}
+.psheet li{list-style:none;display:flex;gap:16px;align-items:flex-start;margin-bottom:18px;font-size:15px;line-height:1.45}
+.psheet li .svg{margin-top:2px;color:var(--text)}
+.cbox{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--sub);margin:4px 0 18px;justify-content:center}
+.cbox i{width:18px;height:18px;border:2px solid #777;border-radius:3px;display:inline-block}
+
+/* Profile drawer */
+.pcard{display:flex;align-items:center;gap:14px;background:var(--card2);border-radius:10px;padding:14px;margin-bottom:12px}
+.pcard .avatar{width:50px;height:50px;font-size:18px}
+.dlist{display:flex;flex-direction:column;gap:6px}
+.dlist button{display:flex;align-items:center;gap:18px;height:50px;font-size:16px;font-weight:600;text-align:left;color:var(--text)}
+.friends{display:flex;gap:18px;margin:16px 0 22px;overflow-x:auto;scrollbar-width:none}
+.friends .f{width:72px;flex-shrink:0;text-align:center;font-size:13px}
+.friends .fc{width:64px;height:64px;border-radius:50%;margin:0 auto 6px;background:linear-gradient(135deg,#8ca3b5,#2d3b4a);display:grid;place-items:center;font-size:20px;font-weight:700;color:#fff;position:relative}
+.friends .fc.ring{box-shadow:0 0 0 2px var(--green)}
+.friends .add{background:var(--card2);width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin:0 auto 6px}
+.banner{background:#fff;color:#000;border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;margin-bottom:16px}
+.banner .btn{background:#000;color:#fff;border-radius:16px;padding:7px 12px;font-size:13px;margin-left:auto}
+
+/* Playlist header */
+.hero{position:relative;margin:-44px -14px 0;padding:56px 14px 0;background:linear-gradient(180deg,#7a3c1f 0%,#3a1c10 45%,#121212 95%);overflow:hidden}
+.hero .ib{position:absolute;top:50px}
+.pl-art{width:200px;height:200px;margin:14px auto 22px;border-radius:4px;display:grid;place-items:center;color:#fff;font-size:72px;font-weight:800;position:relative;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.pl-art::after{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.14),transparent 50%)}
+.artist-hero{height:300px;margin:-44px -14px 0;position:relative;padding:0 16px 16px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.artist-hero .fade{position:absolute;inset:0;background:linear-gradient(transparent 35%,var(--bg) 98%)}
+.artist-hero .ib{position:absolute;top:50px;left:12px;z-index:2}
+.artist-hero h1{position:relative;font-size:40px;font-weight:900;letter-spacing:-.02em;z-index:1}
+.artist-hero .meta{position:relative;z-index:1;font-size:14px;margin-top:6px;display:flex;align-items:center;gap:6px}
+
+/* Banner (pre-save) */
+.pre-save{background:var(--card);border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;margin:14px 0;font-size:14px;font-weight:600}
+.pre-save .svg{color:var(--sub)}
+.release{display:flex;align-items:center;gap:12px;padding:8px 0}
+.release .thumb{width:72px;height:72px;border-radius:6px;flex-shrink:0;position:relative;overflow:hidden}
+.rchk{width:18px;height:18px;color:var(--green)}
+
+/* Edit and name */
+.form-row{display:flex;align-items:center;gap:12px;padding:8px 0}
+.field{width:100%;background:none;border:0;border-bottom:1px solid #444;font-size:16px;padding:10px 0;color:var(--text);outline:none}
+.field::placeholder{color:var(--dim)}
+.subhead{display:flex;align-items:center;justify-content:space-between;height:48px}
+.subhead .ib{width:36px;height:36px}
+.wire{background:#fff!important}
+.wire,.wire *{background-image:none!important;box-shadow:none!important;text-shadow:none!important}
+.wire *{background-color:transparent!important;color:#222!important;border-color:#bbb!important}
+.wire svg{stroke:#333!important}
+.wire .art,.wire .rnd,.wire .np-art,.wire .pl-art,.wire .jcard .art,.wire .feature,.wire .genre,.wire .tile,.wire .qcard .thumb,.wire .mini,.wire .nav,.wire .sheet,.wire .overlay,.wire .card,.wire .stat,.wire .group,.wire .lyr-card,.wire .summary{background-color:#e6e6e6!important}
+.wire .play-g,.wire .play-big,.wire .chip.on,.wire .green-btn,.wire .pill.solid,.wire .btn-block{background-color:#999!important;color:#fff!important}
+button:focus-visible,input:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<aside class="notes">
+  <h3>Matches the recording</h3>
+  <label style="display:flex;gap:8px;align-items:center;margin-bottom:14px;font-size:14px;color:var(--text);cursor:pointer"><input type="checkbox" onchange="document.querySelector('.device').classList.toggle('wire',this.checked)"> Wireframe view</label>
+  <ol>
+    <li><b>Source.</b> This recording is of Spotify. The mockup follows its screens, layout, and flows.</li>
+    <li><b>Flows covered.</b> Home, Search, Now Playing, lyrics, add-to-playlist, playlist and edit, artist, album, Library, profile, and settings.</li>
+    <li><b>Placeholders.</b> Lyrics, bios, and credit names are placeholder text. Song and artist titles are from the video.</li>
+    <li><b>Not included.</b> The on-screen recording badge and the phone keyboard, which come from the operating system.</li>
+    <li><b>Branding.</b> Before shipping, replace the Spotify name and logo with your own.</li>
+  </ol>
+</aside>
+
+<div class="device" id="device">
+  <div class="status"><span>11:11</span><span style="font-size:12px">35%</span></div>
+  <div class="screen" id="screen"></div>
+  <div class="mini" id="mini"></div>
+  <nav class="nav" id="nav"></nav>
+  <div class="overlay" id="now"></div>
+  <div class="scrim" id="scrim" onclick="closeAll()"></div>
+  <div class="sheet" id="sheet"></div>
+  <div class="drawer" id="drawer"></div>
+  <div class="dialog" id="dialog"></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const I={
+  home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+  library:'<path d="M4 4v16M9 4v16"/><path d="M14 5l5 14"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  plusCircle:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+  check:'<circle cx="12" cy="12" r="10" fill="#1ed760" stroke="none"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#000" stroke-width="2.2"/>',
+  more:'<circle cx="12" cy="5" r="1.7" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.7" fill="currentColor" stroke="none"/>',
+  dots:'<circle cx="5" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.7" fill="currentColor" stroke="none"/>',
+  back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+  down:'<path d="M6 9l6 6 6-6"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  share:'<path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>',
+  queue:'<path d="M4 6h16M4 12h16M4 18h10"/>',
+  device:'<rect x="3" y="5" width="14" height="10" rx="2"/><path d="M7 19h6M17 9h3v10h-3"/>',
+  shuffle:'<path d="M3 7h3c4 0 5 10 9 10h3"/><path d="M3 17h3c1.5 0 2.5-1.5 3.3-3.5"/><path d="M14 7h3"/><path d="M17 4l3 3-3 3"/><path d="M17 14l3 3-3 3"/>',
+  prev:'<path d="M18 5L8 12l10 7z"/><path d="M6 5v14"/>',
+  next:'<path d="M6 5l10 7-10 7z"/><path d="M18 5v14"/>',
+  pause:'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
+  play:'<path d="M7 5v14l12-7z"/>',
+  heart:'<path d="M12 20s-7-4.4-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.6-9 9-9 9z"/>',
+  download:'<path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+  verified:'<path d="M12 3l2.4 2 3.1-.2.9 3 2.6 1.7-1 2.9 1 2.9-2.6 1.7-.9 3-3.1-.2L12 21l-2.4-2-3.1.2-.9-3-2.6-1.7 1-2.9-1-2.9 2.6-1.7.9-3 3.1.2z" fill="#1ed760" stroke="none"/><path d="M8.5 12.2l2.3 2.3 4.7-4.7" stroke="#000" stroke-width="2"/>',
+  lyrics:'<path d="M5 6h14M5 11h9M5 16h12"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  arrowUp:'<path d="M7 17L17 7M9 7h8v8"/>',
+  grid:'<rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/>',
+  sort:'<path d="M7 5v14M4 16l3 3 3-3M17 19V5M14 8l3-3 3 3"/>',
+  pencil:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  minus:'<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
+  drag:'<path d="M4 8h16M4 12h16M4 16h16"/>',
+  bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+  timer:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  chart:'<path d="M4 19V5M4 19h16M8 15l3-4 3 2 5-6"/>',
+  user:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.5 18c1.2-2.5 3.2-3.5 5.5-3.5s4.3 1 5.5 3.5"/>',
+  note:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  speaker:'<path d="M4 9v6h4l5 4V5L8 9z"/>',
+  megaphone:'<path d="M4 10v4h3l8 4V6L7 10z"/><path d="M18 9a4 4 0 0 1 0 6"/>',
+  bars:'<path d="M5 20V12M12 20V5M19 20v-9"/>',
+  cloud:'<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4 4 0 0 1 0 9z"/>',
+  devices:'<rect x="3" y="4" width="12" height="9" rx="1.5"/><path d="M7 20h4M9 17v3M16 9h5v11h-5"/>',
+  eye:'<path d="M3 3l18 18"/><path d="M10.6 6.1A10 10 0 0 1 12 6c6 0 9 6 9 6a15 15 0 0 1-2.2 3M6.6 6.6A15 15 0 0 0 3 12s3 6 9 6a9 9 0 0 0 4.4-1.1"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+  newPl:'<path d="M3 6h12M3 12h8M3 18h6M18 14v6M15 17h6"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>'
+};
+const svg=(n,c='')=>`<svg class="svg ${c}" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
+const more=()=>`<button class="ib plain" aria-label="More" onclick="openSheet('track')">${svg('more')}</button>`;
+
+const G={
+  warm:'linear-gradient(160deg,#c7743f,#4a2312)',
+  warm2:'linear-gradient(160deg,#8a4a2a,#2a140b)',
+  warm3:'linear-gradient(160deg,#b56a3c,#3b1d0e)',
+  dark:'linear-gradient(160deg,#4d5a66,#171b20)',
+  blue:'linear-gradient(160deg,#3aa7ff,#132a5c)',
+  gold:'linear-gradient(160deg,#f5c96b,#7a4b12)',
+  green:'linear-gradient(160deg,#2fbf8f,#0c4d3a)',
+  teal:'linear-gradient(160deg,#22c1cf,#0b4f57)',
+  violet:'linear-gradient(160deg,#9b72ff,#2b1657)',
+  sunset:'linear-gradient(160deg,#ff8a4c,#7a1f3d)',
+  grey:'linear-gradient(160deg,#a3a9b6,#3a3e49)',
+  liked:'linear-gradient(135deg,#6f5cff,#c6b8ff)',
+  spades:'linear-gradient(160deg,#b06a2c,#3a1d0c 60%,#121212)'
+};
+
+/* Data from the recording (titles and names). Lyrics and credits are placeholders. */
+const libRows=[
+  {t:'Liked Songs',s:'Playlist • kaaru',g:G.liked,ic:'heart',click:"openSub('liked')"},
+  {t:'Panata',s:'Playlist • kaaru',g:G.warm,txt:'P',click:"openSub('playlist')"},
+  {t:'Mahal Magmahal',s:'Playlist • kaaru',g:G.dark,txt:'M',click:"openSub('playlist')"},
+  {t:'IV OF SPADES',s:'Artist',g:G.spades,txt:'I',round:true,click:"openSub('artist','spades')"},
+  {t:'Mahal Magmahal Radio',s:'Playlist • Spotify',g:G.gold,txt:'M',click:"openSub('radio','mahal')"},
+  {t:'What a good life',s:'Playlist • kaaru',g:G.teal,txt:'W',click:"openSub('playlist')"},
+  {t:'IV OF SPADES: The Complete Playlist',s:'Playlist • Fitz Philippines',g:G.sunset,txt:'I',click:"openSub('playlist')"}
+];
+const recentHome=[
+  {t:'Mahal Magmahal',s:'Esremborak',g:G.dark,txt:'M',playing:true},
+  {t:'Mr. Loverman',s:'Ricky Montgomery',g:G.grey,txt:'R',round:true},
+  {t:'lit(var)',s:'kensuke ushio',g:G.blue,txt:'L'}
+];
+const quick=[
+  ['Huminga',G.teal],['Liked Songs',G.liked],['Mahal Magmahal Ra...',G.dark],['What a good life',G.green],
+  ['IV OF SPADES',G.spades],['Sino Radio',G.violet],['IV OF SPADES: The Complete Playlist',G.sunset],['Dulo Ng Hangganan Radio',G.gold]
+];
+const recents=[
+  {t:'Syempre',s:'Song • Artist A',g:G.blue,st:'check'},
+  {t:'Mr. Loverman',s:'Song • Ricky Montgomery',g:G.grey,st:'check'},
+  {t:'Jane!',s:'Song • The Long Faces',g:G.dark,st:'plus'},
+  {t:'in the pool',s:'Song • kensuke ushio',g:G.dark,st:'check'},
+  {t:'Kiss All The Time, Disco, Occasionally',s:'Album • Harry Styles',g:G.gold,st:'plus'},
+  {t:'Malay Ko',s:'Song • Daniel Padilla',g:G.gold,st:'check'},
+  {t:'Panata',s:'Song • Tothapi',g:G.warm,st:'check'}
+];
+const suggest=['panata','panata ikaw lang ang pipiliin','panata mrld','panata instrumental','panaginip'];
+const chipsSearch=['Songs','Albums','Playlists','Artists','Podcasts','Genres & Moods','Profiles'];
+const savedLists=[
+  {n:'Liked Songs',s:'',g:G.liked,ic:'heart'},
+  {n:'Liked',s:'363 songs',g:G.gold},
+  {n:'Mahal Magmahal',s:'1 song',g:G.dark},
+  {n:'What a good life',s:'25 songs',g:G.teal},
+  {n:'Homies Playlist',s:'105 songs',g:G.warm2},
+  {n:'ikaw?',s:'10 songs',g:G.blue}
+];
+const lyrics=['Lyric line one','Lyric line two','Lyric line three','Lyric line four','…','Lyric line six','Lyric line seven','Lyric line eight','Lyric line nine','Lyric line ten'];
+const recommended=[
+  {t:'Malay Ko',s:'Daniel Padilla',g:G.gold},{t:'Sagip',s:'Jan Roberts',g:G.grey},{t:'Janice',s:'Dilaw',g:G.teal},
+  {t:'Lalim',s:'MATÉO',g:G.dark},{t:'Pinipili',s:'MATÉO',g:G.warm2},{t:'Byahe (Hunyo)',s:'Kyle Raphael',g:G.gold}
+];
+const plTracks=[{t:'Panata',s:'Tothapi',g:G.warm}];
+const spadesPopular=[['Kabisado','100,098,384'],['Mundo','425,448,756'],['Come Inside Of My Heart','407,903,472'],['Dulo Ng Hangganan','152,877,676'],['Aura','79,230,091']];
+const albumTracks=[['Tara','IV OF SPADES'],['Monster','IV OF SPADES'],['Paru-Paro','IV OF SPADES'],['Nanaman','IV OF SPADES']];
+
+const tracks={
+  panata:{t:'Panata',a:'Tothapi',g:G.warm,mini:'#4a1f16',tint:'#7a4220',dark:'#3a1d0e',from:'"panata" in Search',art:'P'},
+  susundan:{t:'Susundan',a:'IV OF SPADES',g:'linear-gradient(160deg,#2a7fd6,#0c2a5a)',mini:'#12305e',tint:'#1d5fa8',dark:'#0a2a55',from:'Album • Susundan',art:'S'}
+};
+const resultsAll=[
+  {t:'Panata',s:'Song • Tothapi',g:G.warm,st:'check',type:'Song',track:'panata'},
+  {t:'Susundan',s:'Song • IV OF SPADES',g:tracks.susundan.g,st:'check',type:'Song',track:'susundan'},
+  {t:'Mundo',s:'Song • IV OF SPADES',g:G.gold,st:'check',type:'Song'},
+  {t:'Tara',s:'Song • IV OF SPADES',g:G.blue,st:'check',type:'Song'},
+  {t:'Andalucia',s:'Song • IV OF SPADES',g:G.dark,st:'check',type:'Song'},
+  {t:'Ikaw At Ako',s:'Song • Johnoy Danao',g:G.dark,st:'check',type:'Song'},
+  {t:'Bawat Piyesa',s:'Song • Munimuni',g:G.warm2,st:'check',type:'Song'},
+  {t:'Panata (Ikaw lang ang pipiliin)',s:'Song • Kiel Manibale',g:G.dark,st:'plus',type:'Song'},
+  {t:'TROPICAL DREAM',s:'Album • IV OF SPADES • Releases on Dec 9, 2026',g:G.blue,st:'plus',type:'Album',click:"openSub('album','susundan')"},
+  {t:'Andalucia',s:'Album • IV OF SPADES',g:G.dark,st:'plus',type:'Album',click:"openSub('album','andalucia')"},
+  {t:'Susundan',s:'Single • IV OF SPADES',g:tracks.susundan.g,st:'check',type:'Album',click:"openSub('album','susundan')"},
+  {t:'Litrato man natin ay kumupas',s:'Playlist',g:G.gold,st:'plus',type:'Playlist'},
+  {t:'IV OF SPADES: The Complete Playlist',s:'Playlist • Fitz Philippines',g:G.sunset,st:'plus',type:'Playlist'},
+  {t:'IV OF SPADES Radio',s:'Playlist • Spotify',g:G.green,st:'plus',type:'Playlist',click:"openSub('radio','mahal')"},
+  {t:'Sentimental IV OF SPADES',s:'Playlist',g:G.warm3,st:'plus',type:'Playlist'},
+  {t:'IV OF SPADES',s:'Artist',g:G.spades,type:'Artist'},
+  {t:'Munimuni',s:'Artist',g:G.warm2,type:'Artist'},
+  {t:'juan karlos',s:'Artist',g:G.blue,type:'Artist'},
+  {t:'Unique Salonga',s:'Artist',g:G.gold,type:'Artist'},
+  {t:'Lola Amour',s:'Artist',g:G.teal,type:'Artist'},
+  {t:'Silent Sanctuary',s:'Artist',g:G.dark,type:'Artist'},
+  {t:'Ben&Ben',s:'Artist',g:G.green,type:'Artist'},
+  {t:'Rico Blanco',s:'Artist',g:G.warm3,type:'Artist'},
+  {t:'Cup of Joe',s:'Artist',g:G.sunset,type:'Artist'}
+];
+const radios={
+  dionela:{t:'Dionela Radio',sub:'With Earl Agustin, Cup of Joe, Arthur Nery and more',g:G.sunset,dur:'3h 33min',
+    tracks:[['Ikigai (feat. Loonie)','Dionela, Loonie'],['LASIK','HEY JUNE!'],['Tibok','Earl Agustin'],['Mundo','IV OF SPADES'],['Pwede Ba','Lola Amour'],['Orasa','Dilaw'],['Pasiyo','SunKissed Lola'],['Passenger Seat','Earl Agustin']]},
+  mahal:{t:'Mahal Magmahal Radio',sub:'With Esremborak, shirebound, Jin DC and more',g:G.gold,dur:'3h 19min',
+    tracks:[['Mahal Magmahal','Esremborak'],['ako ang bagyo','SHEAN'],['Pwede Ka Ba?','Frank Ely']]}
+};
+const genreTiles=[['Decades',G.warm],['Love',G.violet],['Metal',G.liked],['Hometown',G.warm2],['Jazz',G.teal],['Trending',G.blue],['Classical',G.gold],['Folk & Acoustic',G.sunset],['Disney',G.blue],['Focus',G.green],['Soul',G.warm3],['Kids & Family',G.teal],['Talk',G.liked],['Wellness',G.green],['Christian & Gospel',G.violet],['Karaoke',G.dark],['Halloween',G.sunset],['Reggae',G.green],['Mixed By',G.grey],['Radio',G.violet],['RADAR',G.warm2],['In the car',G.teal],['Latin',G.warm],['Dance/Electronic',G.blue],['Mood',G.violet],['Rock',G.sunset],['K-pop',G.liked],['Pinoy Music',G.gold],['Fresh Finds',G.gold],['Discover',G.green]];
+const featureCats=[['Music',G.liked],['Podcasts',G.green],['Audiobooks',G.blue],['Live Events',G.violet],['Made For You',G.warm2]];
+const chipTypes=['Song','Album','Playlist','Artist','Podcast','Genre','Profile'];
+const homeChipNames=['All','Music','Following','Podcasts','Audiobooks'];
+const sleepOptions=['5 minutes','10 minutes','15 minutes','30 minutes','45 minutes','1 hour','End of track'];
+const addCandidates=[
+  {t:'Malay Ko',s:'Song • Daniel Padilla',g:G.gold},{t:'Sagip',s:'Song • Jan Roberts',g:G.grey},
+  {t:'Janice',s:'Song • Dilaw',g:G.teal},{t:'Lalim',s:'Song • MATÉO',g:G.dark},
+  {t:'Pinipili',s:'Song • MATÉO',g:G.warm2},{t:'Susundan',s:'Song • IV OF SPADES',g:tracks.susundan.g}
+];
+const state={
+  tab:'home', sub:null, subId:null, q:'', submitted:false, chip:0, libChip:0, libSub:'all', homeChip:0,
+  searchFocus:false, previewId:null, addTab:'most',
+  playing:true, shuffle:false, repeat:false, saved:true, lyricsOn:true, lyricsFull:false, activeLyric:3,
+  following:{}, inList:{'Liked Songs':true,'Liked':true}, priv:true, dataSaver:false, sheet:null, drawer:false,
+  dialog:false, nowOpen:false, toast:'', track:'panata', sleep:null, preSaved:false, added:{}, addQ:'',
+  queue:[{t:'Rollercoaster',a:'IV OF SPADES',g:'linear-gradient(160deg,#5b7d4a,#0f1a14)'},{t:'Nagbabalik',a:'Rico Blanco, IV OF SPADES',g:'linear-gradient(160deg,#8a4a2a,#2a140b)'},{t:'Bata, Dahan-Dahan!',a:'IV OF SPADES',g:'linear-gradient(150deg,#ff4d5e,#5c1028)'},{t:'Kabanata',a:'Unique Salonga',g:'linear-gradient(150deg,#f5c96b,#7a4b12)'},{t:'Isang Pag-ibig',a:'IV OF SPADES',g:'linear-gradient(150deg,#3aa7ff,#132a5c)'}]
+};
+let toastTimer=null;
+
+/* Shared pieces */
+function trow(x,opts={}){
+  const stateIcon = x.st==='check' ? svg('check') : x.st==='plus' ? `<span class="act">${svg('plusCircle')}</span>` : '';
+  const thumb = `<div class="rnd ${x.round?'c':''}" style="background:${x.g}">${x.txt||''}</div>`;
+  return `<div class="trow" ${opts.click?`onclick="${opts.click}"`:''}>
+    ${thumb}
+    <div class="meta"><div class="t ${opts.playing?'grn':''}">${x.t}</div><div class="s">${opts.playing?'<span class="eq"><i></i><i></i><i></i></span>':''}${x.s}</div></div>
+    <div class="act">${x.st?stateIcon:''}${opts.more===false?'':more()}</div>
+  </div>`;
+}
+const grp=(title,action='')=>`<div class="grp"><h2 class="h2" style="margin:0;flex:1;min-width:0;font-size:20px;line-height:1.2">${title}</h2>${action}</div>`;
+const h2=(title)=>`<div class="grp"><h2 class="h2" style="margin:0">${title}</h2></div>`;
+
+/* Tabs */
+function vHome(){
+  if(state.homeChip===2) return homeTop()+followingSection();
+  if(state.homeChip>=3) return homeTop()+podcastSection();
+  return homeTop()+homeMusic();
+}
+
+function searchBody(){
+  if(!state.q){
+    return state.searchFocus ? recentsBlock() : browseGrid();
+  }
+  if(!state.submitted){
+    return suggestFor(state.q).map(s=>`<button class="trow" onclick="submitQ('${s}')" style="min-height:48px"><span class="act" style="color:var(--sub)">${svg('search')}</span><div class="meta"><div class="t" style="font-weight:400">${s}</div></div><span class="act">${svg('arrowUp')}</span></button>`).join('');
+  }
+  const type=chipTypes[state.chip];
+  const list=resultsAll.filter(x=>x.type===type);
+  const head=(state.chip===0 && /iv|spades/i.test(state.q)) ? spadesHeader() : '';
+  return `
+    <div class="chips" style="padding:4px 0 10px">${chipsSearch.map((c,i)=>`<button class="chip ${state.chip===i?'on':'out'}" onclick="setChip(${i})">${c}</button>`).join('')}</div>
+    ${head}
+    ${list.length?list.map(resultRow).join(''):`<div class="sub" style="padding:28px 0;text-align:center">No ${chipsSearch[state.chip].toLowerCase()} found for "${state.q}"</div>`}`;
+}
+function vSearch(){
+  return `
+  <div class="top">
+    <div style="display:flex;align-items:center;gap:10px;flex:1">
+      <button class="ib plain" aria-label="Back" onclick="go('home')">${svg('back')}</button>
+      <div style="flex:1;height:40px;background:#242424;border-radius:6px;display:flex;align-items:center;padding:0 12px;gap:8px;color:var(--sub)">
+        ${svg('search')}
+        <input id="q" value="${state.q.replace(/"/g,'&quot;')}" placeholder="What do you want to listen to?" autocomplete="off" oninput="typeQ(this.value)" onfocus="focusSearch()" onkeydown="if(event.key==='Enter'){event.preventDefault();submitQ(this.value)}" style="background:none;border:0;outline:none;color:var(--text);font-size:15px;flex:1;min-width:0">
+        <button id="sclear" class="ib plain" onclick="typeQ('')" aria-label="Clear" style="visibility:${state.q?'visible':'hidden'}">${svg('x')}</button>
+      </div>
+    </div>
+  </div>
+  <div id="sbody" style="margin-top:12px">${searchBody()}</div>`;
+}
+
+function vLibrary(){
+  const tabs=['Playlists','Podcasts','Albums','Artists'];
+  let body='';
+  if(state.libChip===0){
+    const sub=state.libSub;
+    const rows=libRows.filter(r=> sub==='all' || (sub==='you' ? r.s.includes('kaaru') : r.s.includes('Spotify')));
+    body=`<div class="chips" style="padding:0 0 10px">${[['all','All'],['you','By you'],['spotify','By Spotify']].map(([k,l])=>`<button class="chip sm ${sub===k?'on':'out'}" onclick="setLibSub('${k}')">${l}</button>`).join('')}</div>`
+      + `<div class="list">${rows.map(r=>trow({t:r.t,s:r.s,g:r.g,txt:r.txt,round:r.round},{click:r.click})).join('')}</div>`;
+  }else if(state.libChip===3){
+    body=`<button class="trow" onclick="openSub('artist','spades')"><div class="rnd c" style="background:${G.spades}">I</div><div class="meta"><div class="t">IV OF SPADES</div><div class="s">Artist</div></div></button>
+      <button class="trow" onclick="toast('Add artists is not in this mockup.')"><div class="rnd c" style="background:#2a2a2a">${svg('plus')}</div><div class="meta"><div class="t">Add artists</div></div></button>
+      <button class="trow" onclick="toast('Import your music is not in this mockup.')"><div class="rnd c" style="background:#2a2a2a">${svg('download')}</div><div class="meta"><div class="t">Import your music</div></div></button>`;
+  }else{
+    body=`<div class="empty" style="padding:30px 0"><h3>Nothing here yet</h3><p class="muted">Items you save or create will show here.</p></div>`;
+  }
+  return `
+  <div class="top">
+    <div class="h1" style="font-size:24px">Your Library</div>
+    <div style="display:flex;gap:18px;color:var(--text)"><button class="ib plain" aria-label="Search" onclick="openSub('libsearch')">${svg('search')}</button><button class="ib plain" aria-label="Create" onclick="openSheet('create')">${svg('plus')}</button></div>
+  </div>
+  <div class="chips">${tabs.map((l,i)=>`<button class="chip ${state.libChip===i?'on':''}" onclick="setLibChip(${i})">${l}</button>`).join('')}</div>
+  <div class="row-btns" style="margin:4px 0 8px"><span class="sub" style="display:flex;align-items:center;gap:8px">${svg('sort')} Recents</span><span class="sp"></span>${svg('grid')}</div>
+  ${body}`;
+}
+
+
+
+/* Sub-screens */
+function artistView(id){
+  const a= id==='spades' ? {n:'IV OF SPADES',l:'7.3M monthly listeners',g:G.spades,verified:true} : id==='kensuke' ? {n:'kensuke ushio',l:'1.1M monthly listeners',g:'linear-gradient(170deg,#c99a5c,#2a1a10)',verified:true} : {n:'Tothapi',l:'1.6M monthly listeners',g:G.warm,verified:true};
+  const f=state.following[id];
+  if(id==='spades'){
+    return `
+    <div class="artist-hero" style="background:${a.g}"><div class="fade"></div>
+      <button class="ib dark" aria-label="Back" onclick="back()">${svg('back')}</button>
+      <h1>${a.n}</h1>
+      <div class="meta">${svg('verified','')} <span>Verified artist</span></div>
+      <div class="meta sub" style="color:var(--sub)">${a.l}</div>
+    </div>
+    <div class="row-btns" style="margin-top:12px">
+      <button class="pill ${f?'solid':''}" onclick="toggleFollow('${id}')">${f?'Following':'Follow'}</button>
+      <button class="ib plain" aria-label="Download">${svg('download')}</button>
+      <span class="sp"></span>
+      <button class="ib plain" aria-label="Shuffle" style="color:var(--green)">${svg('shuffle')}</button>
+      <button class="play-g" aria-label="Play" onclick="togglePlay()">${svg('play','fill')}</button>
+    </div>
+    <div class="pre-save">${svg('download')} Pre-save the upcoming album <span class="sp" style="flex:1"></span>${svg('next')}</div>
+    ${h2('Popular')}
+    ${spadesPopular.map((p,i)=>`<div class="trow" style="min-height:56px"><span class="num" style="width:14px;color:var(--sub);font-size:14px">${i+1}</span><div class="rnd" style="background:${G.warm}"></div><div class="meta"><div class="t">${p[0]}</div><div class="s">${p[1]}</div></div><div class="act">${svg('check')}${more()}</div></div>`).join('')}
+    <div style="text-align:center;margin:8px 0"><button class="pill">See more</button></div>
+    ${h2('Artist Pick')}
+    <div style="position:relative;border-radius:8px;height:180px;background:${G.warm};margin-bottom:8px;overflow:hidden"><span style="position:absolute;left:10px;top:10px;background:#fff;color:#000;border-radius:14px;padding:4px 10px;font-size:12px;font-weight:700">'Susundan' out now</span></div>
+    ${h2('Popular releases')}
+    <div class="release"><div class="thumb" style="background:${G.blue}"></div><div><div class="t">TROPICAL DREAM</div><div class="s">Album • 2026 · Releases Dec 9</div></div></div>
+    <div class="release"><div class="thumb" style="background:${G.gold}"></div><div><div class="t">Susundan</div><div class="s">Single • 2026 · Latest release</div></div></div>`;
+  }
+  return `
+    <div class="artist-hero" style="background:${a.g}"><div class="fade"></div>
+      <button class="ib dark" aria-label="Back" onclick="back()">${svg('back')}</button>
+      <h1>${a.n}</h1>
+      <div class="meta">${svg('verified')} <span>Verified artist</span></div>
+    </div>
+    <div class="sub" style="margin:10px 0 8px">${a.l}</div>
+    <div class="sub" style="line-height:1.5">Placeholder bio text for the artist goes here.</div>
+    <div class="row-btns">
+      <button class="pill ${f?'solid':''}" onclick="toggleFollow('${id}')">${f?'Following':'Follow'}</button>
+      <button class="ib plain" aria-label="Download">${svg('download')}</button>
+      <span class="sp"></span>
+      <button class="play-g" aria-label="Play" onclick="togglePlay()">${svg('play','fill')}</button>
+    </div>
+    ${h2('Credits')}
+    ${[['Tothapi','Main artist • Composer • Producer'],['Credit name 1','Composer • Lyricist'],['Credit name 2','Lyricist • Recording engineer']].map(c=>`<div class="trow" style="min-height:56px"><div class="meta"><div class="t">${c[0]}</div><div class="s">${c[1]}</div></div><button class="pill follow">Follow</button></div>`).join('')}
+    ${h2('Explore Tothapi')}
+    <div class="hscroll">
+      <div class="jcard" style="width:130px"><div class="art" style="width:130px;height:170px;background:${G.warm2}"></div><div class="t" style="font-size:14px">Songs by Tothapi</div></div>
+      <div class="jcard" style="width:130px"><div class="art" style="width:130px;height:170px;background:${G.dark}"></div><div class="t" style="font-size:14px">Similar to Tothapi</div></div>
+      <div class="jcard" style="width:130px"><div class="art" style="width:130px;height:170px;background:${G.warm3}"></div><div class="t" style="font-size:14px">Similar to Panata</div></div>
+    </div>`;
+}
+
+function playlistView(){
+  return `
+  <div class="hero">
+    <div class="top" style="position:relative;z-index:2"><button class="ib dark" aria-label="Back" onclick="back()">${svg('back')}</button><span></span><button class="ib dark" aria-label="More" onclick="openSheet('playlist')">${svg('more')}</button></div>
+    <div class="pl-art" style="background:${G.warm}">P</div>
+    <div style="font-size:26px;font-weight:800">Panata</div>
+    <div class="sub" style="display:flex;align-items:center;gap:8px;margin-top:8px"><span class="rnd" style="width:22px;height:22px;border-radius:50%;background:${G.gold};font-size:10px;display:inline-grid">+</span><span style="color:var(--text);font-weight:600">kaaru</span></div>
+    <div class="sub" style="margin:6px 0 4px;display:flex;align-items:center;gap:6px">${svg('globe')} 4min</div>
+    <div class="row-btns" style="margin-top:10px;margin-bottom:0">
+      <button class="ib plain" aria-label="Download">${svg('download')}</button>
+      <button class="ib plain" aria-label="Share">${svg('share')}</button>
+      <span class="sp"></span>
+      <button class="ib plain" aria-label="Shuffle" style="color:var(--green)">${svg('shuffle')}</button>
+      <button class="play-g" aria-label="Play" onclick="togglePlay()">${svg('play','fill')}</button>
+    </div>
+  </div>
+  <div class="gap-chips" style="margin-top:12px">
+    <button class="pill" onclick="go2('addsongs')">${svg('plus')} Add</button>
+    <button class="pill">${svg('edit')} Edit</button>
+    <button class="pill" onclick="go2('name')">${svg('pencil')} Name &amp; details</button>
+    <button class="pill">${svg('sort')} Sort</button>
+  </div>
+  <div style="margin-top:14px"></div>
+  ${plTracks.map(p=>`<div class="trow"><div class="rnd" style="background:${p.g}"></div><div class="meta"><div class="t">${p.t}</div><div class="s">${p.s}</div></div>${more()}</div>`).join('')}
+  <div class="grp" style="margin-top:20px"><div><h2 class="h2" style="margin:0 0 4px">Recommended Songs</h2><div class="sub">Based on the songs in this playlist</div></div></div>
+  ${recommended.map(r=>`<div class="trow"><div class="rnd" style="background:${r.g}"></div><div class="meta"><div class="t">${r.t}</div><div class="s">${r.s}</div></div><span class="act">${svg('plusCircle')}</span></div>`).join('')}
+  <div style="text-align:center;margin:14px 0"><button class="pill solid">Refresh</button></div>`;
+}
+
+function albumView(){
+  return `
+  <div class="hero" style="background:${G.dark}">
+    <div class="top" style="position:relative;z-index:2"><button class="ib dark" aria-label="Back" onclick="back()">${svg('back')}</button><span></span><button class="ib dark" aria-label="More">${svg('more')}</button></div>
+    <div class="pl-art" style="background:${G.dark};width:220px;height:220px">A</div>
+    <div style="font-size:24px;font-weight:800">Andalucia</div>
+    <div class="sub" style="margin-top:6px">Album • 5 Nov 2025</div>
+  </div>
+  <div class="row-btns" style="margin-top:8px">
+    <button class="ib plain" style="color:var(--green)">${svg('check')}</button>
+    <button class="ib plain">${svg('download')}</button>
+    <button class="ib plain">${svg('share')}</button>
+    <span class="sp"></span>
+    <button class="ib plain" style="color:var(--green)">${svg('shuffle')}</button>
+    <button class="play-g" onclick="togglePlay()">${svg('play','fill')}</button>
+  </div>
+  ${albumTracks.map(t=>`<div class="trow"><div class="meta"><div class="t">${t[0]}</div><div class="s">${t[1]}</div></div><span class="act">${svg('check')}${more()}</span></div>`).join('')}`;
+}
+
+function editView(){
+  return `
+  <div class="subhead"><button class="ib plain" onclick="back()">${svg('back')}</button><span style="font-size:18px;font-weight:700">Edit playlist</span><span style="color:var(--dim);font-weight:700;font-size:15px">Save</span></div>
+  <div class="trow" style="margin-top:10px"><span class="act">${svg('minus')}</span><div class="rnd" style="background:${G.warm}"></div><div class="meta"><div class="t">Panata</div><div class="s">Tothapi</div></div><span class="act">${svg('drag')}</span></div>
+  <div style="position:absolute;left:14px;right:14px;bottom:20px"><button class="pill" style="width:100%;height:44px;font-size:15px">Select</button></div>`;
+}
+
+function nameView(){
+  return `
+  <div class="subhead"><button class="pill" onclick="back()">Cancel</button><span style="font-size:17px;font-weight:700">Name &amp; details</span><span style="color:var(--dim);font-weight:700;font-size:15px">Save</span></div>
+  <div style="display:flex;gap:14px;align-items:center;margin-top:18px">
+    <div style="width:110px;height:110px;border-radius:4px;background:${G.warm};position:relative;display:grid;place-items:center;font-size:40px;font-weight:800">P<span style="position:absolute;right:6px;bottom:6px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.6);display:grid;place-items:center">${svg('pencil')}</span></div>
+    <input class="field" value="Panata" style="font-size:18px;font-weight:600">
+  </div>
+  <input class="field" placeholder="Add description" style="margin-top:18px">
+  <div class="srow" style="margin-top:14px">${svg('lock')}<div class="meta"><div class="t">Make private</div></div><span class="toggle"></span></div>
+  <button class="srow" style="color:var(--red)"><span style="color:var(--red)">${svg('x')}</span><span class="t" style="color:var(--red)">Delete playlist</span></button>`;
+}
+
+function settingsView(){
+  const rows=[
+    ['user','Account','Username • Close account'],
+    ['note','Content and display','Canvas • Allow explicit content'],
+    ['lock','Privacy and social','Private session • Public playlists'],
+    ['speaker','Playback','Gapless playback • Autoplay'],
+    ['bell','Notifications','Push • Email'],
+    ['devices','Apps and devices','Google Maps • Import from other apps'],
+    ['cloud','Data-saving and offline','Data saver mode • Downloads over cellular'],
+    ['bars','Media quality','Wi-Fi streaming quality • Audio download quality'],
+    ['megaphone','Advertising','Tailored ads'],
+    ['info','About and support','Version • Privacy policy']
+  ];
+  return `
+  <div class="subhead"><button class="ib plain" aria-label="Back" onclick="back()">${svg('back')}</button><span style="font-size:17px;font-weight:700">Settings</span><button class="ib plain" aria-label="Search">${svg('search')}</button></div>
+  <div class="stiles" style="margin-top:8px">
+    <button class="stile" onclick="toggleSaver()">${svg('bars')}<div class="t">Data saver mode</div><div class="s" style="color:${state.dataSaver?'var(--green)':'var(--sub)'}">${state.dataSaver?'Always on':'Always off'}</div></button>
+    <button class="stile" onclick="openSheet('private')">${svg('eye')}<div class="t">Private session</div><div class="s" style="color:${state.priv?'var(--green)':'var(--sub)'}">${state.priv?'On':'Off'}</div></button>
+  </div>
+  <div class="grp" style="margin-top:16px"><h2 class="h2" style="margin:0;font-size:18px">Free account</h2><button class="pill solid">Go Premium</button></div>
+  ${rows.map(r=>`<button class="srow">${svg(r[0])}<div class="meta"><div class="t">${r[1]}</div><div class="s">${r[2]}</div></div>${svg('chevR')}</button>`).join('')}
+  <button class="logout">Log out</button>`;
+}
+
+/* Views router */
+function pageHTML(){
+  if(state.sub){
+    const k=state.sub, id=state.subId;
+    if(k==='playlist') return playlistView();
+    if(k==='artist') return artistView(id);
+    if(k==='album') return id==='susundan'?singleView():albumView();
+    if(k==='addsongs') return addSongsView();
+    if(k==='addliked') return addLikedView();
+    if(k==='liked') return likedView();
+    if(k==='radio') return radioView(id);
+    if(k==='browse') return browseView(id);
+    if(k==='recents') return recentsView();
+    if(k==='libsearch') return libSearchView();
+    if(k==='edit') return editView();
+    if(k==='name') return nameView();
+    if(k==='settings') return settingsView();
+  }
+  return {home:vHome,search:vSearch,library:vLibrary}[state.tab]();
+}
+
+/* Sheets, drawer, dialog, overlays */
+function sheetHTMLOld(kind){
+  if(kind==='track'){
+    return `<div class="grab"></div>
+    <div class="trow" style="padding:0 0 14px;border-bottom:1px solid #3a3a3a;margin-bottom:6px"><div class="rnd" style="background:${tracks[state.track].g}"></div><div class="meta"><div class="t">${tracks[state.track].t}</div><div class="s">${tracks[state.track].a}</div></div></div>
+    <button class="mrow" onclick="closeAll()">${svg('share')} Share</button>
+    <button class="mrow" onclick="toggleLyricsOn()">${svg('lyrics')} Lyrics <span class="pre ${state.lyricsOn?'':'gray'}">${state.lyricsOn?'On':'Off'}</span></button>
+    <button class="mrow" onclick="toggleSaved()">${svg('heart')} ${state.saved?'Remove from':'Add to'} Liked Songs</button>
+    <button class="mrow" onclick="openSheet('saved')">${svg('plusCircle')} Add to playlist</button>
+    <button class="mrow" onclick="closeAll()">${svg('queue')} Add to Queue</button>
+    <button class="mrow" onclick="closeAll()">${svg('queue')} Go to Queue</button>
+    <button class="mrow" onclick="closeAll()">${svg('device')} Go to album</button>
+    <button class="mrow" onclick="closeAll();openSub('artist','tothapi')">${svg('user')} Go to artist</button>`;
+  }
+  if(kind==='saved'){
+    return `<div class="grab"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:18px;font-weight:700">Saved in</span><button class="link-g" onclick="openDialog()">New playlist</button></div>
+    ${savedLists.map(l=>{ const on=!!state.inList[l.n]; return `<button class="trow" onclick="toggleList('${l.n.replace(/'/g,"\\'")}')" style="min-height:56px"><div class="rnd" style="background:${l.g}">${l.ic?'':l.n[0]}</div><div class="meta"><div class="t">${l.n}</div><div class="s">${l.s}</div></div><span class="act">${on?svg('check'):svg('plusCircle')}</span></button>`; }).join('')}`;
+  }
+  if(kind==='playlist'){
+    return `<div class="grab"></div>
+    <div class="trow" style="padding:0 0 14px;border-bottom:1px solid #3a3a3a;margin-bottom:6px"><div class="rnd" style="background:${G.warm}"></div><div class="meta"><div class="t">Panata</div><div class="s">by kaaru • Public playlist</div></div></div>
+    <button class="mrow" onclick="closeAll()">${svg('share')} Share</button>
+    <button class="mrow" onclick="closeAll()">${svg('download')} Download <span class="pre">Premium</span></button>
+    <button class="mrow" onclick="closeAll()">${svg('plusCircle')} Add to this playlist</button>
+    <button class="mrow" onclick="closeAll();go2('edit')">${svg('edit')} Edit playlist</button>
+    <button class="mrow" onclick="closeAll();go2('name')">${svg('pencil')} Name &amp; details</button>
+    <button class="mrow" onclick="closeAll()">${svg('lyrics')} Create cover art</button>
+    <button class="mrow" onclick="closeAll()" style="color:var(--red)">${svg('x')} Delete playlist</button>
+    <button class="mrow" onclick="closeAll()">${svg('plusCircle')} Add to other playlist</button>`;
+  }
+  if(kind==='private'){
+    return `<div class="grab"></div>
+    <div class="psheet">
+      <div style="text-align:center;font-size:20px;font-weight:800;margin-bottom:18px">How private sessions work</div>
+      <ul>
+        <li>${svg('devices')}<span>Your listening activity is hidden on devices you're signed into and on connected apps.</span></li>
+        <li>${svg('clock')}<span>What you play won't show in Recents or on your profile.</span></li>
+        <li>${svg('sort')}<span>What you play won't change recommendations or listening stats.</span></li>
+        <li>${svg('timer')}<span>Private sessions end after 6 hours. You can start another one right after.</span></li>
+      </ul>
+      <div class="cbox"><i></i> Don't show this again</div>
+      <button class="green-btn" style="width:100%" onclick="togglePriv();closeAll()">Got it</button>
+    </div>`;
+  }
+  return '';
+}
+function nowHTML(){
+  const tr=tracks[state.track];
+  const bigArt=`<div class="np-art" style="background:${tr.g}">${tr.art}</div>`;
+  const controls=`
+    <div class="ctrl">
+      <button class="side ${state.shuffle?'':'muted'}" style="${state.shuffle?'color:var(--green)':''}" onclick="toggleShuffle()" aria-label="Shuffle">${svg('shuffle')}</button>
+      <button class="side" aria-label="Previous">${svg('prev','fill')}</button>
+      <button class="big" aria-label="${state.playing?'Pause':'Play'}" onclick="togglePlay()">${svg(state.playing?'pause':'play','fill')}</button>
+      <button class="side" aria-label="Next">${svg('next','fill')}</button>
+      <button class="side" aria-label="Sleep timer" onclick="openSheet('timer')" style="${state.sleep?'color:var(--green)':''}">${svg('timer')}</button>
+    </div>`;
+  const bottom=`<div class="np-bottom"><button class="ib plain" aria-label="Device">${svg('device')}</button><span class="sp"></span><div style="display:flex;gap:4px;align-items:center"><button class="ib plain" aria-label="Share" onclick="openSheet('share')">${svg('share')}</button><button class="ib plain" aria-label="Queue" onclick="openSheet('queue')">${svg('queue')}</button></div></div>`;
+  const header=`<div class="np-top"><button class="ib plain" aria-label="Close" onclick="closeNow()">${svg('down')}</button><div class="center"><div class="label">Playing from</div><div class="t" style="font-weight:700">${tr.from}</div></div><button class="ib plain" aria-label="More" onclick="openSheet('track')">${svg('dots')}</button></div>`;
+  if(state.lyricsFull){
+    const lines=lyrics.map((l,i)=> l==='…' ? `<div class="lf-line instr">♪ ♪ ♪</div>` : `<div class="lf-line ${i===state.activeLyric?'on':(i<state.activeLyric?'past':'')}" onclick="setLyric(${i})">${l}</div>`).join('');
+    return `<div class="lyrics-full" style="margin:-44px -20px 0">
+      ${header}
+      <div style="font-size:14px;color:#f3c7bb;margin-bottom:10px;font-weight:700">${tr.t} • ${tr.a}</div>
+      ${lines}
+      <div class="lf-bottom" style="margin-top:18px;display:flex;flex-direction:column;gap:14px">
+        <button class="pill" style="align-self:flex-start;display:flex;gap:6px;align-items:center">${svg('share')} Share</button>
+        <div class="np-prog"><div class="track"><div class="fill" style="width:30%"></div></div><div class="times"><span>1:19</span><span>4:35</span></div></div>
+        <div style="display:flex;justify-content:center"><button class="big" style="width:64px;height:64px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center" onclick="togglePlay()">${svg(state.playing?'pause':'play','fill')}</button></div>
+      </div>
+    </div>`;
+  }
+  return `${header}${bigArt}
+    <div class="np-title"><div><div class="big">${tr.t}</div><div class="sub" style="font-size:16px;margin-top:4px">${tr.a}</div></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="ib plain" aria-label="Download" onclick="toast('Downloading '+tr.t+'.')" style="width:34px;height:34px;border-radius:50%;border:1px solid #666">${svg('download')}</button>
+      <button class="ib plain" aria-label="Save" onclick="toggleSaved()" style="width:34px;height:34px;border-radius:50%;border:1px solid #666;${state.saved?'color:var(--green);border-color:transparent':''}">${svg(state.saved?'check':'plusCircle')}</button>
+    </div></div>
+    <div class="np-prog"><div class="track"><div class="fill" style="width:5%"></div></div><div class="times"><span>0:11</span><span>4:35</span></div></div>
+    ${controls}${bottom}
+    <div class="lyr-card" onclick="toggleLyricsFull()">
+      <div class="hd">Lyrics preview</div>
+      <p>Lyric line one</p><p style="opacity:.6">Lyric line two</p>
+      <button class="pill" onclick="event.stopPropagation();toggleLyricsFull()">Show lyrics</button>
+    </div>`;
+}
+
+/* Behaviour added from the second recording */
+function homeChipButtons(){
+  return homeChipNames.map((c,i)=>`<button class="chip ${state.homeChip===i?'on':''}" onclick="setHomeChip(${i})">${c}</button>`).join('');
+}
+function homeTop(){
+  return `<div class="top" style="margin-bottom:4px">
+    <button class="avatar" aria-label="Profile" onclick="openDrawer()">K</button>
+    <div class="chips" style="flex:1;padding:0 0 0 8px">${homeChipButtons()}</div>
+  </div>`;
+}
+function setHomeChip(i){ state.homeChip=i; render(); }
+function homeMusic(){
+  return `
+  <div class="quick">
+    ${quick.map(q=>`<button class="qcard" onclick="openSub('playlist')"><div class="thumb" style="background:${q[1]}"></div><span>${q[0]}</span></button>`).join('')}
+  </div>
+  ${grp('Your recent rotation')}
+  ${recentHome.map(r=>trow({t:r.t,s:r.s,g:r.g,txt:r.txt,round:r.round},{playing:r.playing,more:true})).join('')}
+  ${grp('Jump back in','<button class="link-g">Show all</button>')}
+  <div class="hscroll">
+    <button class="jcard" onclick="openSub('playlist')"><div class="art" style="background:${G.warm}"></div><div class="t">Panata</div><div class="sub">Playlist • kaaru</div></button>
+    <button class="jcard" onclick="openSub('artist','spades')"><div class="art round" style="background:${G.spades}"></div><div class="t">IV OF SPADES</div><div class="sub">Artist</div></button>
+    <button class="jcard" onclick="openSub('album','andalucia')"><div class="art" style="background:${G.dark}"></div><div class="t">Andalucia</div><div class="sub">Album • IV OF SPADES</div></button>
+  </div>
+  ${cardRow('Your top mixes',[{t:'Tothapi Mix',s:'IV OF SPADES, MATEO and shirebound',g:G.warm,click:"openSub('playlist')"},{t:'kensuke ushio Mix',s:'The Dreamer Piano and Masa...',g:G.dark,click:"openSub('artist','kensuke')"},{t:'Your Top Mix 3',s:'Playlist • Spotify',g:G.violet}])}
+  ${cardRow('Recommended stations',[{t:'Joji',s:'Cigarettes After Sex, Joji...',g:G.warm,radio:true,click:"openSub('radio','dionela')"},{t:'Clairo',s:'Steve Lacy, Mac DeMarco...',g:G.teal,radio:true,click:"openSub('radio','mahal')"},{t:'Lana Del Rey',s:'Taylor Swift, The Weeknd...',g:G.green,radio:true,click:"openSub('radio','mahal')"}])}
+  ${cardRow('Popular radio',[{t:'LANY',s:'LANY, Troye Sivan, Lauv...',g:G.green,radio:true,click:"openSub('radio','dionela')"},{t:'Flow G',s:'Flow G, Juan Karlos, Bugoy Na Koykoy...',g:G.blue,radio:true,click:"openSub('radio','mahal')"},{t:'Ben&Ben',s:'Arthur Nery, Cup of Joe...',g:G.teal,radio:true,click:"openSub('radio','dionela')"}])}
+  ${cardRow('Albums featuring songs you like',[{t:'Another One',s:'Mac DeMarco • Album',g:G.grey},{t:'Love Deluxe',s:'Sade • Album',g:G.gold},{t:'TROPICAL DREAM',s:'IV OF SPADES • Album',g:G.blue,click:"openSub('album','susundan')"}])}
+  ${cardRow("Today's biggest hits",[{t:'Hot Hits Philippines',s:'Ariana Grande, ADELE, Ashe...',g:G.liked},{t:'Viral Hits',s:'The Weeknd, LANY, Uncle Dugs...',g:G.green}])}
+  ${cardRow('Made for you',[{t:'Mac DeMarco Mix',s:'Spotify • 50 songs',g:G.teal,preview:'mdm'},{t:'60s Mix',s:'Spotify • 50 songs',g:G.sunset,preview:'60s'},{t:'I Trust Mix',s:'Spotify • 50 songs',g:G.gold,preview:'itrust'}])}
+  ${cardRow('Based on your recent listening',[{t:'OPM: Hits of the 00s',s:'Spotify • 40 songs',g:G.violet,preview:'opm00'},{t:'Fresh picks',s:'Spotify',g:G.warm2,preview:'fresh'}])}
+  ${cardRow('Workout',[{t:'Workout Mix',s:'Spotify',g:G.dark},{t:'Morning Stroll',s:'Spotify',g:G.teal}])}
+  ${cardRow('Your playlists',[{t:'What a good life',s:'Playlist • kaaru',g:G.teal},{t:'Homies Playlist',s:'Playlist • kaaru',g:G.blue}])}`;
+}
+function followingSection(){
+  return `${grp('Latest releases')}
+  ${trow({t:'Susundan',s:'IV OF SPADES • 1 week ago',g:tracks.susundan.g,txt:'S'},{click:"playTrack('susundan')",playing:state.track==='susundan'})}
+  <button class="trow" onclick="openSub('album','susundan')" style="min-height:64px"><div class="rnd" style="background:${G.spades}">I</div><div class="meta"><div class="t">Rollercoaster</div><div class="s">Single • Oct 7</div></div>${more()}</button>`;
+}
+function podcastSection(){
+  return cardRow('Episodes you might like',[{t:'Learn to be silent',s:'Dark Realism • Podcast',g:G.liked},{t:'They Finally Used It',s:'PenguinD • Podcast',g:G.teal}])
+  + cardRow('Podcasts for you',[{t:'Dionela Radio',s:'Radio',g:G.sunset,radio:true,click:"openSub('radio','dionela')"},{t:'Pinoy Music',s:'Playlist • Spotify',g:G.gold,click:"openSub('browse','Pinoy Music')"},{t:'OPM Says Chillax',s:'Playlist • Spotify',g:G.teal},{t:'OPM Binge',s:'Playlist • Spotify',g:G.dark}])
+  + cardRow('Made for you',[{t:'TV Girl Mix',s:'Spotify • 50 songs',g:G.violet,preview:'tvgirl'}]);
+}
+function resultRow(x){
+  if(x.type==='Artist'){
+    const key='search-'+x.t, f=state.following[key];
+    return `<div class="trow" style="min-height:60px"><div class="rnd c" style="background:${x.g}">${x.t[0]}</div><div class="meta"><div class="t">${x.t}</div><div class="s">Artist</div></div><button class="pill ${f?'solid':''}" onclick="toggleFollow('${key}')">${f?'Following':'Follow'}</button></div>`;
+  }
+  return trow(x,{click: x.click || (x.track?`playTrack('${x.track}')`:'')});
+}
+function playTrack(id){ state.track=id; state.playing=true; render(); }
+function togglePreSave(){ state.preSaved=!state.preSaved; toast(state.preSaved?'Pre-saved TROPICAL DREAM.':'Pre-save removed.'); render(); }
+function setSleep(v){ state.sleep=v; state.sheet=null; toast(v?'Sleep timer set: '+v+'.':'Sleep timer off.'); render(); }
+function singleView(){
+  const tr=tracks.susundan;
+  return `
+  <div class="hero" style="background:${tr.g}">
+    <div class="top" style="position:relative;z-index:2"><button class="ib dark" aria-label="Back" onclick="back()">${svg('back')}</button><span></span><button class="ib dark" aria-label="More" onclick="openSheet('album')">${svg('more')}</button></div>
+    <div class="pl-art" style="background:${tr.g};width:220px;height:220px">S</div>
+    <div style="font-size:24px;font-weight:800">Susundan</div>
+    <div class="sub" style="margin-top:6px">Single • 11 Nov • Latest release</div>
+  </div>
+  <div class="row-btns" style="margin-top:8px">
+    <button class="ib plain" aria-label="Save to library" onclick="toggleLibrary()" style="${state.saved?'color:var(--green)':''}">${svg(state.saved?'check':'plusCircle')}</button>
+    <button class="ib plain" aria-label="Download">${svg('download')}</button>
+    <button class="ib plain" aria-label="Share" onclick="openSheet('share')">${svg('share')}</button>
+    <span class="sp"></span>
+    <button class="ib plain" style="color:var(--green)">${svg('shuffle')}</button>
+    <button class="play-g" aria-label="Play" onclick="playTrack('susundan')">${svg('play','fill')}</button>
+  </div>
+  ${trow({t:'Susundan',s:'Song • IV OF SPADES',g:tr.g,txt:'S'},{click:"playTrack('susundan')",playing:state.track==='susundan'})}
+  ${h2('Release countdown')}
+  <div style="border-radius:10px;background:linear-gradient(160deg,#1f5fb0,#0a2a55);padding:16px;display:flex;align-items:center;gap:14px">
+    <div style="width:64px;height:64px;border-radius:6px;background:${G.blue};flex-shrink:0"></div>
+    <div class="meta"><div style="font-weight:800;font-size:17px">TROPICAL DREAM</div><div class="sub">Releases on Dec 9, 2026 • Upcoming album</div></div>
+    <button class="pill ${state.preSaved?'solid':''}" onclick="togglePreSave()">${state.preSaved?'Pre-saved':'Pre-save'}</button>
+  </div>
+  <div class="grp" style="margin-top:20px"><h2 class="h2" style="margin:0">Credits</h2><button class="link-g" onclick="openSheet('credits')">Show all</button></div>
+  <div class="trow" style="min-height:56px"><div class="meta"><div class="t">IV OF SPADES</div><div class="s">Main Artist • Composer • Producer</div></div><button class="pill follow ${state.following['credit-iv']?'solid':''}" onclick="toggleFollow('credit-iv')">${state.following['credit-iv']?'Following':'Follow'}</button></div>
+  ${cardRow('More by IV OF SPADES',[{t:'TROPICAL DREAM',s:'Upcoming • Album',g:G.blue,click:"openSub('album','susundan')"},{t:'Andalucia',s:'2025 • Album',g:G.dark,click:"openSub('album','andalucia')"},{t:'Clap',s:'2019 • Album',g:G.liked}])}
+  ${cardRow('Explore IV OF SPADES',[{t:'Songs by IV OF SPADES',s:'Playlist',g:G.warm2},{t:'Similar to IV OF SPADES',s:'Playlist',g:G.dark},{t:'Similar to Susundan',s:'Playlist',g:G.warm3}])}`;
+}
+function addSongsView(){
+  const q=(state.addQ||'').toLowerCase();
+  const list=addCandidates.filter(c=>c.t.toLowerCase().includes(q));
+  return `
+  <div class="subhead"><button class="ib plain" aria-label="Back" onclick="back()">${svg('back')}</button><span style="font-size:17px;font-weight:700">Add to Panata</span><span style="width:36px"></span></div>
+  <input class="field" id="addq" value="${state.addQ||''}" placeholder="What would you like to add?" oninput="typeAdd(this.value)" style="margin:6px 0 10px">
+  ${list.map(c=>{ const on=!!state.added[c.t]; return `<button class="trow" onclick="toggleAdd('${c.t}')"><div class="rnd" style="background:${c.g}"></div><div class="meta"><div class="t">${c.t}</div><div class="s">${c.s}</div></div><span class="act">${on?svg('check'):svg('plusCircle')}</span></button>`; }).join('')}`;
+}
+function typeAdd(v){ state.addQ=v; render(); const i=document.getElementById('addq'); if(i){ i.focus(); i.setSelectionRange(v.length,v.length); } }
+function toggleAdd(t){ state.added[t]=!state.added[t]; toast(state.added[t]?'Added to Panata.':'Removed from Panata.'); render(); }
+function newSheet(kind){
+  const tr=tracks[state.track];
+  if(kind==='timer'){
+    return `<div class="grab"></div><div style="font-size:18px;font-weight:700;text-align:center;margin-bottom:10px">Sleep timer</div>
+    ${sleepOptions.map(o=>`<button class="mrow" onclick="setSleep('${o}')">${o}<span class="pre">${state.sleep===o?svg('check'):''}</span></button>`).join('')}
+    ${state.sleep?`<button class="mrow" onclick="setSleep(null)" style="color:var(--red)">Turn off sleep timer</button>`:''}`;
+  }
+  if(kind==='queue'){
+    return `<div class="grab"></div><div style="font-size:18px;font-weight:700;margin-bottom:4px">Queue</div>
+    <div class="sub" style="margin-bottom:8px">Hold a song to move it. Swipe left to remove.</div>
+    <div class="label" style="margin:10px 0 4px">Playing ${tr.t}</div>
+    <div id="qlist">${queueRows()}</div>`;
+  }
+  if(kind==='share'){
+    return `<div class="grab"></div><div style="font-size:18px;font-weight:700;margin-bottom:14px">Share</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center;font-size:12px">
+      ${['Copy link','Messages','Instagram','Stories','WhatsApp','TikTok','Threads','Messenger'].map(n=>`<button onclick="closeAll()" style="display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--text)"><span style="width:52px;height:52px;border-radius:50%;background:var(--chip);display:grid;place-items:center">${svg('share')}</span>${n}</button>`).join('')}
+    </div>`;
+  }
+  if(kind==='album'){
+    const inLib=state.saved;
+    return `<div class="grab"></div><div class="trow" style="padding:0 0 14px;border-bottom:1px solid #3a3a3a;margin-bottom:6px"><div class="rnd" style="background:${tracks.susundan.g}">S</div><div class="meta"><div class="t">Susundan</div><div class="s">IV OF SPADES</div></div></div>
+    <button class="mrow" onclick="closeAll()">${svg('share')} Share</button>
+    <button class="mrow" onclick="openSheet('saved')">${svg('plusCircle')} Add to playlist</button>
+    <button class="mrow" onclick="toggleLibrary()">${svg(inLib?'check':'plusCircle')} ${inLib?'Remove from':'Add to'} Your Library</button>
+    <button class="mrow" onclick="closeAll()">${svg('download')} Download <span class="pre">Premium</span></button>
+    <button class="mrow" onclick="closeAll()">${svg('queue')} Add to Queue</button>
+    <button class="mrow" onclick="closeAll()">${svg('timer')} Go to album radio</button>
+    <button class="mrow" onclick="closeAll();openSub('artist','spades')">${svg('user')} Go to artist</button>
+    <button class="mrow" onclick="closeAll()">${svg('share')} Show Spotify code</button>`;
+  }
+  if(kind==='saved'){
+    return `<div class="grab"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:18px;font-weight:700">Saved in</span><button class="link-g" onclick="openDialog()">New playlist</button></div>
+    <button class="trow" onclick="toggleList('Liked Songs')" style="min-height:56px"><div class="rnd c" style="background:${G.liked}">♥</div><div class="meta"><div class="t">Liked Songs</div></div><span class="act">${state.inList['Liked Songs']?svg('check'):svg('plusCircle')}</span></button>
+    <div style="display:flex;gap:8px;align-items:center;margin:4px 0 10px"><input class="field" placeholder="Find playlist" style="margin:0;padding:8px 0;font-size:14px"><button class="chip sm">Sort</button></div>
+    ${savedLists.filter(l=>!l.ic).map(l=>`<button class="trow" onclick="toggleList('${l.n}')" style="min-height:56px"><div class="rnd" style="background:${l.g}"></div><div class="meta"><div class="t">${l.n}</div><div class="s">${l.s}</div></div><span class="act">${state.inList[l.n]?svg('check'):svg('plusCircle')}</span></button>`).join('')}`;
+  }
+  if(kind==='create'){
+    const opts=[['Playlist','Create a playlist with songs or episodes'],['Collaborative playlist','Create a playlist together with friends'],['Blend','Combine your friends\u2019 tastes into a playlist'],['Folder','Organize your playlists'],['Jam','Listen together from anywhere']];
+    return `<div class="grab"></div>${opts.map((o,i)=>`<button class="mrow" style="height:auto;padding:10px 0" onclick="${i===0?'openDialog()':`toast('${o[0]} is not in this mockup.')`}"><span style="width:40px;height:40px;border-radius:10px;background:var(--chip);display:grid;place-items:center">${svg('plus')}</span><span style="display:flex;flex-direction:column"><span style="font-weight:700">${o[0]}</span><span class="sub" style="font-size:13px">${o[1]}</span></span></button>`).join('')}`;
+  }
+  if(kind==='credits'){
+    return `<div class="grab"></div><div style="font-size:18px;font-weight:700;margin-bottom:12px">Credits</div>
+    ${[['Main Artist','Artist name'],['Composition & Lyrics','Credit name 1, Credit name 2'],['Production & Engineering','Credit name 3, Credit name 4'],['Performers','Artist name'],['Sources','Label name']].map(c=>`<div style="margin-bottom:16px"><div style="color:var(--text);font-weight:700;font-size:15px">${c[0]}</div><div class="sub" style="margin-top:4px">${c[1]}</div></div>`).join('')}`;
+  }
+  return null;
+}
+function sheetHTML(kind){ const h=newSheet(kind); return h!==null?h:sheetHTMLOld(kind); }
+
+/* Behaviour from the full recording pass */
+function cardRow(title, items){
+  return `${grp(title,'<button class="link-g">Show all</button>')}
+  <div class="hscroll">${items.map(c=>`<div style="width:150px;flex-shrink:0">
+      <button onclick="${c.click||''}" style="display:block;width:150px;text-align:left;color:var(--text);background:none;border:0">
+        <div style="position:relative;width:150px;height:150px;border-radius:${c.round?'50%':'8px'};background:${c.g};margin-bottom:10px">${c.radio?'<span style="position:absolute;top:6px;left:6px;font-size:9px;font-weight:800;background:var(--green);color:#000;border-radius:3px;padding:1px 4px">RADIO</span>':''}</div>
+        <div class="card-t">${c.t}</div><div class="card-s">${c.s||''}</div>
+      </button>
+      <div style="min-height:32px">${c.preview?previewPill(c.preview,c.single?'Preview single':'Preview playlist'):''}</div>
+    </div>`).join('')}</div>`;
+}
+function previewPill(id,label){
+  const on=state.previewId===id;
+  return `<button class="pill" onclick="togglePreview('${id}')" style="height:26px;font-size:12px;margin-top:6px;${on?'color:var(--green);border-color:var(--green)':'color:var(--dim)'}">${on?'Playing preview':label}</button>`;
+}
+function togglePreview(id){ state.previewId=state.previewId===id?null:id; render(); }
+function browseGrid(){
+  return `
+  <div class="genres" style="grid-template-columns:1fr 1fr;gap:8px">
+    ${featureCats.map(c=>`<button class="genre" style="background:${c[1]};height:76px" onclick="openSub('browse','${c[0]}')">${c[0]}</button>`).join('')}
+  </div>
+  ${grp('Discover something new')}
+  <div class="hscroll">${[['#lovesick',G.warm],['#delulu',G.dark],['#eventful',G.violet]].map(c=>`<div style="width:150px;flex-shrink:0"><div style="width:150px;height:150px;border-radius:8px;background:${c[1]}"></div><div class="t" style="font-size:14px;margin-top:8px">${c[0]}</div></div>`).join('')}</div>
+  ${grp('Browse all')}
+  <div class="genres">${genreTiles.map(g=>`<button class="genre" style="background:${g[1]};height:72px;font-size:15px" onclick="openSub('browse','${g[0]}')">${g[0]}</button>`).join('')}</div>`;
+}
+function recentsBlock(){
+  return `
+    <div class="grp"><h2 class="h2" style="margin:0">Recents</h2><button class="link-g">Clear</button></div>
+    ${recents.map(r=>`<div class="trow"><div class="rnd" style="background:${r.g}">${r.t[0]}</div><div class="meta"><div class="t">${r.t}</div><div class="s">${r.s}</div></div><div class="act">${r.st==='check'?svg('check'):''}<button class="ib plain" aria-label="Remove">${svg('x')}</button></div></div>`).join('')}`;
+}
+function focusSearch(){ if(state.searchFocus) return; state.searchFocus=true; refreshSearch(); }
+function suggestFor(q){ const t=q.trim(); return [t, t+' all songs', t+' songs', t+' playlist', t+' instrumental'].filter((x,i,a)=>x&&a.indexOf(x)===i); }
+function refreshSearch(){
+  const body=document.getElementById('sbody'); if(body) body.innerHTML=searchBody();
+  const clr=document.getElementById('sclear'); if(clr) clr.style.visibility=state.q?'visible':'hidden';
+}
+function spadesHeader(){
+  const f=state.following['search-IV OF SPADES'];
+  return `<div class="trow" style="min-height:60px"><div class="rnd c" style="background:${G.spades}">I</div><div class="meta"><div class="t">IV OF SPADES <span class="green">✓</span></div><div class="s">Artist</div></div><button class="pill ${f?'solid':''}" onclick="toggleFollow('search-IV OF SPADES')">${f?'Following':'Follow'}</button></div>
+  ${grp('Featuring IV OF SPADES')}
+  <div class="hscroll">${[['Workspace',G.grey,'mahal'],['IV OF SPADES Radio',G.green,'mahal'],['Viral Hits Philippines',G.liked,'dionela']].map(c=>`<button onclick="openSub('radio','${c[2]}')" style="width:130px;flex-shrink:0;text-align:left;color:var(--text);background:none;border:0"><div style="width:130px;height:130px;border-radius:8px;background:${c[1]}"></div><div class="t" style="font-size:13px;margin-top:6px">${c[0]}</div></button>`).join('')}</div>`;
+}
+function toggleLibrary(){ state.saved=!state.saved; toast(state.saved?'Added to Your Library.':'Removed from Your Library.'); render(); }
+function recentsView(){
+  const sec=(title,rows)=>`<div style="margin:18px 0 4px;font-weight:700;font-size:15px">${title}</div>${rows.map(r=>`<div class="trow" style="min-height:58px"><div class="rnd" style="background:${r[2]}">${r[3]}</div><div class="meta"><div class="t">${r[0]}</div><div class="s">${r[1]}</div></div>${svg('chevR')}</div>`).join('')}`;
+  return `
+  <div class="subhead"><button class="ib plain" aria-label="Back" onclick="back()">${svg('back')}</button><span style="font-size:17px;font-weight:700">Recents</span><span style="width:36px"></span></div>
+  <div class="chips"><button class="chip sm on">Music</button></div>
+  ${sec('Today',[['Susundan','Single • IV OF SPADES',tracks.susundan.g,'S'],['Panata','2 songs added • Playlist • kaaru',G.warm,'P'],['Liked Songs','3 songs added • Playlist',G.liked,'♥'],['Mahal Magmahal Radio','1 song played • Playlist • Spotify',G.gold,'M']])}
+  ${sec('Yesterday',[['1 song played','',G.blue,'♪'],['Huminga','Zild',G.teal,'H']])}
+  ${sec('Thu, Nov 12, 2026',[['What a good life','7 songs played • Playlist • kaaru',G.teal,'W'],['Mahal Magmahal','1 song added • Playlist • kaaru',G.dark,'M']])}`;
+}
+function likedView(){
+  return `
+  <div class="hero" style="background:linear-gradient(180deg,#2b2a5a,#121212 95%)">
+    <div class="top" style="position:relative;z-index:2"><button class="ib dark" aria-label="Back" onclick="back()">${svg('back')}</button><span></span><button class="ib dark" aria-label="More" onclick="openSheet('track')">${svg('more')}</button></div>
+    <div style="font-size:36px;font-weight:900;margin-top:24px">Liked Songs</div>
+    <div class="sub" style="margin-top:6px">887 songs</div>
+  </div>
+  <div class="row-btns" style="margin-top:8px"><button class="ib plain">${svg('download')}</button><span class="sp"></span><button class="ib plain" style="color:var(--green)">${svg('shuffle')}</button><button class="play-g" onclick="playTrack('panata')">${svg('play','fill')}</button></div>
+  <button class="trow" onclick="openSub('addliked')" style="min-height:56px"><div class="rnd c" style="background:#2a2a2a">${svg('plus')}</div><div class="meta"><div class="t">Add to this playlist</div></div></button>
+  ${addCandidates.slice(0,5).map(c=>trow(c,{click:"playTrack('panata')"})).join('')}`;
+}
+function setAddTab(t){ state.addTab=t; render(); }
+function addLikedView(){
+  const q=(state.addQ||'').toLowerCase();
+  const list=addCandidates.filter(c=>c.t.toLowerCase().includes(q));
+  return `
+  <div class="subhead"><button class="ib plain" aria-label="Back" onclick="back()">${svg('back')}</button><span style="font-size:17px;font-weight:700">Add to Liked Songs</span><span style="width:36px"></span></div>
+  <div class="chips"><button class="chip sm ${state.addTab==='most'?'on':'out'}" onclick="setAddTab('most')">Most played</button><button class="chip sm ${state.addTab==='songs'?'on':'out'}" onclick="setAddTab('songs')">Songs</button></div>
+  <input class="field" id="addq" value="${state.addQ||''}" placeholder="What would you like to add?" oninput="typeAdd(this.value)" style="margin:6px 0 10px">
+  ${list.map(c=>{ const on=!!state.added[c.t]; return `<button class="trow" onclick="toggleAdd('${c.t}')"><div class="rnd" style="background:${c.g}"></div><div class="meta"><div class="t">${c.t}</div><div class="s">${c.s}</div></div><span class="act">${on?svg('check'):svg('plusCircle')}</span></button>`; }).join('')}`;
+}
+function setLibSub(k){ state.libSub=k; render(); }
+function libSearchView(){
+  return `
+  <div class="subhead"><button class="ib plain" aria-label="Back" onclick="back()">${svg('back')}</button><input class="field" placeholder="Search your library" style="margin:0"></div>
+  <div class="empty"><div class="empty-ic">${svg('search')}</div><h3>Find your favorites</h3><p class="muted">Search everything you've saved, followed, or created.</p></div>`;
+}
+function radioView(id){
+  const r=radios[id];
+  return `
+  <div class="hero" style="background:${r.g}">
+    <div class="top" style="position:relative;z-index:2"><button class="ib dark" aria-label="Back" onclick="back()">${svg('back')}</button><span></span><button class="ib dark" aria-label="More" onclick="openSheet('track')">${svg('more')}</button></div>
+    <div style="font-size:40px;font-weight:900;line-height:1.02;margin-top:20px">${r.t}</div>
+  </div>
+  <div class="sub" style="margin-top:12px">${r.sub}</div>
+  <div class="sub" style="margin-top:6px"><span style="color:var(--text);font-weight:600">About</span> recommendations and the impact of promotion</div>
+  <div class="sub" style="margin-top:4px">${r.dur}</div>
+  <div class="row-btns">
+    <button class="ib plain" aria-label="Add">${svg('plusCircle')}</button>
+    <button class="ib plain" aria-label="Download">${svg('download')}</button>
+    <button class="ib plain" aria-label="Share" onclick="openSheet('share')">${svg('share')}</button>
+    <span class="sp"></span>
+    <button class="ib plain" style="color:var(--green)">${svg('shuffle')}</button>
+    <button class="play-g" onclick="playTrack('panata')">${svg('play','fill')}</button>
+  </div>
+  ${r.tracks.map(t=>trow({t:t[0],s:t[1],g:r.g,txt:t[0][0]},{click:"playTrack('panata')"})).join('')}`;
+}
+function browseView(name){
+  const cards=(n)=>[{t:`${n} 1`,s:'Playlist • Spotify',g:G.warm},{t:`${n} 2`,s:'Playlist • Spotify',g:G.blue},{t:`${n} 3`,s:'Playlist • Spotify',g:G.gold}];
+  return `
+  <div class="subhead"><button class="ib plain" aria-label="Back" onclick="back()">${svg('back')}</button><span style="width:36px"></span><button class="ib plain" aria-label="Share" onclick="openSheet('share')">${svg('share')}</button></div>
+  <div style="font-size:34px;font-weight:900;margin:6px 0 14px">${name}</div>
+  ${cardRow('Best of '+name,cards('Best'))}
+  ${cardRow('This is '+name,cards('This is'))}
+  ${cardRow('New releases in '+name,cards('New'))}
+  ${grp('Stories from our editors')}
+  <div class="hscroll">${[G.warm,G.gold,G.teal].map(g=>`<div style="width:200px;flex-shrink:0"><div style="width:200px;height:140px;border-radius:8px;background:${g}"></div><div class="t" style="font-size:14px;margin-top:8px">Editor story</div></div>`).join('')}</div>`;
+}
+
+/* Editable queue: hold to move, swipe left to remove */
+function queueRows(){
+  if(!state.queue.length) return `<div class="sub" style="padding:24px 0;text-align:center">The queue is empty.</div>`;
+  return state.queue.map((q,i)=>`<div class="qrow" data-i="${i}" style="position:relative;touch-action:none;user-select:none;margin-bottom:6px;border-radius:8px;overflow:hidden">
+      <div style="position:absolute;inset:0;background:var(--red);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:flex-end;padding-right:18px;border-radius:8px">Remove</div>
+      <div class="qfront" style="position:relative;background:var(--card2);transition:transform .2s;border-radius:8px">
+        <div class="trow" style="min-height:58px;padding:6px 8px"><div class="rnd" style="background:${q.g}">${q.t[0]}</div><div class="meta"><div class="t">${q.t}</div><div class="s">${q.a}</div></div><span class="act">${svg('drag')}</span></div>
+      </div>
+    </div>`).join('');
+}
+function removeQueue(i){ const it=state.queue.splice(i,1)[0]; toast('Removed '+(it?it.t:'song')+' from queue.'); render(); }
+function moveQueue(from,to){ const [it]=state.queue.splice(from,1); state.queue.splice(to,0,it); render(); }
+function bindQueue(){
+  const list=document.getElementById('qlist'); if(!list) return;
+  list.querySelectorAll('.qrow').forEach(row=>{
+    const front=row.querySelector('.qfront');
+    let id=null, sx=0, sy=0, dx=0, dy=0, mode=null, timer=null;
+    const clear=()=>{ clearTimeout(timer); timer=null; };
+    row.addEventListener('pointerdown', e=>{
+      id=e.pointerId; sx=e.clientX; sy=e.clientY; dx=0; dy=0; mode='pending';
+      try{ row.setPointerCapture(id); }catch(_){}
+      timer=setTimeout(()=>{
+        if(mode!=='pending') return;
+        mode='move';
+        row.style.zIndex=5;
+        front.style.transition='none';
+        front.style.boxShadow='0 10px 24px rgba(0,0,0,.5)';
+        if(navigator.vibrate) navigator.vibrate(15);
+      }, 350);
+    });
+    row.addEventListener('pointermove', e=>{
+      if(e.pointerId!==id) return;
+      dx=e.clientX-sx; dy=e.clientY-sy;
+      if(mode==='pending'){
+        if(Math.abs(dx)>8 && Math.abs(dx)>Math.abs(dy)){ clear(); mode='swipe'; front.style.transition='none'; }
+        else if(Math.abs(dy)>8){ clear(); mode='scroll'; }
+      }
+      if(mode==='swipe') front.style.transform=`translateX(${Math.min(0,dx)}px)`;
+      if(mode==='move') front.style.transform=`translateY(${dy}px)`;
+    });
+    const end=e=>{
+      if(e.pointerId!==id) return;
+      clear();
+      const m=mode; id=null; mode=null;
+      front.style.transition='transform .2s'; front.style.boxShadow=''; row.style.zIndex='';
+      if(m==='swipe' && dx<-120){ removeQueue(+row.dataset.i); return; }
+      if(m==='move'){
+        const from=+row.dataset.i;
+        const rows=[...list.querySelectorAll('.qrow')];
+        const fr=front.getBoundingClientRect(); const mid=fr.top+fr.height/2;
+        let to=from, best=Infinity;
+        rows.forEach((r,i)=>{ if(i===from) return; const b=r.getBoundingClientRect(); const d=Math.abs(b.top+b.height/2-mid); if(d<best){ best=d; to=i; } });
+        if(to!==from){ moveQueue(from,to); return; }
+      }
+      front.style.transform='';
+    };
+    row.addEventListener('pointerup', end);
+    row.addEventListener('pointercancel', end);
+  });
+}
+/* Rendering */
+function renderNav(){
+  const items=[['home','Home','home'],['search','Search','search'],['library','Your Library','library']];
+  document.getElementById('nav').innerHTML=items.map(([k,l,ic])=>
+    `<button class="${state.tab===k&&!state.sub?'on':''}" onclick="go('${k}')">${svg(ic)}<span>${l}</span></button>`
+  ).join('')+`<button onclick="openSheet('create')">${svg('plusCircle')}<span>Create</span></button>`;
+}
+function renderMini(){
+  const tr=tracks[state.track];
+  const m=document.getElementById('mini');
+  m.style.background=tr.mini;
+  m.innerHTML=`
+    <div class="bar"><i style="width:9%"></i></div>
+    <div class="rnd" style="width:44px;height:44px;background:${tr.g}">${tr.art}</div>
+    <div class="meta"><div class="t" style="font-size:14px">${tr.t}</div><div class="s" style="font-size:12px">${tr.a}</div></div>
+    <button class="ib plain" aria-label="Device">${svg('device')}</button>
+    <button class="ib plain" aria-label="Save" onclick="event.stopPropagation();toggleSaved()" style="${state.saved?'color:var(--green)':''}">${svg(state.saved?'check':'plusCircle')}</button>
+    <button class="ib plain" aria-label="${state.playing?'Pause':'Play'}" onclick="event.stopPropagation();togglePlay()">${svg(state.playing?'pause':'play','fill')}</button>`;
+  m.onclick=openNow;
+}
+function render(){
+  const scr=document.getElementById('screen'); scr.innerHTML=pageHTML(); scr.classList.toggle('enter',!!state.enter); state.enter=false;
+  renderMini();
+  renderNav();
+  document.getElementById('now').innerHTML=nowHTML();
+  { const tr=tracks[state.track]; document.getElementById('now').style.background=`linear-gradient(180deg,${tr.tint} 0%,#121212 62%)`; }
+  document.getElementById('now').classList.toggle('open',state.nowOpen);
+  document.getElementById('sheet').innerHTML=sheetHTML(state.sheet||'track');
+  document.getElementById('sheet').classList.toggle('open',!!state.sheet);
+  if(state.sheet==='queue') bindQueue();
+  document.getElementById('drawer').innerHTML=drawerHTML();
+  document.getElementById('drawer').classList.toggle('open',state.drawer);
+  document.getElementById('dialog').innerHTML=dialogHTML();
+  document.getElementById('dialog').classList.toggle('open',state.dialog);
+  document.getElementById('toast').textContent=state.toast;
+  document.getElementById('toast').classList.toggle('open',!!state.toast);
+  document.getElementById('scrim').classList.toggle('open',!!(state.sheet||state.drawer||state.dialog));
+}
+function drawerHTML(){
+  return `
+  <div class="pcard"><div class="avatar" style="width:50px;height:50px;font-size:18px">K</div><div><div class="t" style="font-size:18px;font-weight:700">kaaru</div><div class="sub">View profile</div></div></div>
+  <button class="srow" style="padding:14px 4px;font-weight:600;font-size:16px;color:var(--text)">${svg('plusCircle')}<span>Add account</span></button>
+  <div class="dlist" style="margin-top:6px">
+    <button>${svg('chart')} Listening stats</button>
+    <button onclick="openSub('recents')">${svg('clock')} Recents</button>
+    <button>${svg('bell')} Your Updates</button>
+    <button onclick="openSub('settings')">${svg('settings')} Settings and privacy</button>
+  </div>
+  <div class="friends">
+    <div class="f"><div class="fc ring">K</div>Activity<div class="sub" style="color:var(--green)">On</div></div>
+    <div class="f"><div class="fc">D</div>Drie<div class="sub" style="color:var(--green)">${svg('bars')} You Mak...</div></div>
+    <div class="f"><div class="add">${svg('plus')}</div>Invite friends</div>
+  </div>
+  <div class="grp" style="margin:0 0 10px"><h2 class="h2" style="margin:0;font-size:18px">Messages</h2>${svg('edit')}</div>
+  <div class="banner">${svg('bell')} Turn on push notifications so you don't miss a reply.<button class="btn">Turn on</button></div>
+  <div class="trow"><div class="rnd c" style="background:${G.violet}">D</div><div class="meta"><div class="t" style="font-size:15px">Drie</div><div class="s">Shared a song • Aug 25</div></div></div>
+  <button class="trow" style="min-height:56px"><div class="rnd c" style="background:#2a2a2a">${svg('edit')}</div><div class="meta"><div class="t" style="font-size:15px">New message</div></div></button>`;
+}
+function dialogHTML(){
+  return `
+  <div style="width:56px;height:56px;margin:0 auto;border-radius:50%;background:var(--card);display:grid;place-items:center">${svg('plusCircle')}</div>
+  <div style="font-size:18px;font-weight:800;margin-top:14px">Give your playlist a name</div>
+  <input id="plname" value="Panata" maxlength="40">
+  <div class="btns"><button class="pill" onclick="closeAll()">Cancel</button><button class="green-btn" onclick="createPlaylist()">Create</button></div>`;
+}
+
+/* Actions */
+function go(t){ state.enter=true; state.tab=t; state.sub=null; state.subId=null; state.nowOpen=false; if(t!=='search'){ state.searchFocus=false; state.q=''; state.submitted=false; } render(); document.getElementById('screen').scrollTop=0; }
+function go2(s){ state.sub=s; state.sheet=null; render(); document.getElementById('screen').scrollTop=0; }
+function openSub(kind,id){ state.enter=true; state.sub=kind; state.subId=id||null; state.sheet=null; render(); document.getElementById('screen').scrollTop=0; }
+function back(){ state.enter=true; state.sub=null; state.subId=null; render(); }
+function typeQ(v){
+  state.q=v; state.submitted=false;
+  refreshSearch();
+  const inp=document.getElementById('q');
+  if(inp && inp.value!==v) inp.value=v;
+}
+function submitQ(v){ state.q=v; state.submitted=true; const inp=document.getElementById('q'); if(inp){ inp.value=v; inp.blur(); } refreshSearch(); }
+function setChip(i){ state.chip=i; render(); }
+function setLibChip(i){ state.libChip=i; render(); }
+function togglePlay(){ state.playing=!state.playing; render(); }
+function toggleShuffle(){ state.shuffle=!state.shuffle; render(); }
+function toggleSaved(){ state.saved=!state.saved; toast(state.saved?'Added to Liked Songs.':'Removed from Liked Songs.'); render(); }
+function toggleLyricsOn(){ state.lyricsOn=!state.lyricsOn; render(); }
+function toggleLyricsFull(){ state.lyricsFull=!state.lyricsFull; render(); }
+function setLyric(i){ state.activeLyric=i; render(); }
+function toggleFollow(id){ state.following[id]=!state.following[id]; render(); }
+function toggleSaver(){ state.dataSaver=!state.dataSaver; render(); }
+function togglePriv(){ state.priv=!state.priv; render(); }
+function toggleList(n){ state.inList[n]=!state.inList[n]; render(); }
+function openSheet(k){ state.sheet=k; render(); }
+function openNow(){ state.nowOpen=true; render(); }
+function closeNow(){ state.nowOpen=false; render(); }
+function openDrawer(){ state.drawer=true; render(); }
+function openDialog(){ state.dialog=true; state.sheet=null; render(); }
+function createPlaylist(){
+  const name=(document.getElementById('plname')||{}).value||'Panata';
+  state.inList[name]=true; state.dialog=false; state.sheet=null;
+  toast('Added to '+name+'.'); render();
+}
+function toast(msg){ state.toast=msg; clearTimeout(toastTimer); toastTimer=setTimeout(()=>{state.toast='';render();},1800); }
+function closeAll(){ state.sheet=null; state.drawer=false; state.dialog=false; render(); }
+
+render();
+</script>
+</body>
+</html>

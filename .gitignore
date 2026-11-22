@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Node / backend
+node_modules/
+dist/
+build/
+.env
+.env.*
+*.log
+
+# Xcode / iOS
+xcuserdata/
+DerivedData/
+*.ipa
+
+# Android / Gradle
+.gradle/
+local.properties
+*.apk
+*.aab
+
+# IDE
+.idea/
+.vscode/
+
+# Sandbox artifacts - never commit tokens or credentials
+*token*
