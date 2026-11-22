@@ -87,8 +87,8 @@ interface CatalogProvider {
 
 **Implementations, in build order:**
 
-1. **`OwnCatalogProvider`** (M0–M1): admin-uploaded audio + LRC + art in object storage; rows in Postgres. Guaranteed to work, zero external risk. This is what the playback milestone is built and tested against.
-2. **`YtmProvider`** (M2): metadata + streams resolved from YouTube / YouTube Music the same way OpenSpot and Musify do it (doc 05 documents the exact mechanism and risks). The **server** does the resolution; clients only ever see our API. Benefits: clients stay clean of extractor code, one place to patch when upstream changes, response caching, and catalog rows get persisted so playlists survive source churn.
+1. **`OwnCatalogProvider`** (M0–M1, **implemented**): admin-uploaded audio + LRC + art in object storage; rows in Postgres. M1 ships the seed catalog (4 artists / 4 albums / 10 tracks) and the Prisma repository; the admin upload path itself arrives with M2 playback. Guaranteed to work, zero external risk. This is what the playback milestone is built and tested against.
+2. **`YtmProvider`** (M1 interface, **disabled by default**; D-014): metadata + streams resolved from YouTube / YouTube Music the same way OpenSpot and Musify do it (doc 05 documents the exact mechanism and risks). The **server** does the resolution; clients only ever see our API. Benefits: clients stay clean of extractor code, one place to patch when upstream changes, response caching, and catalog rows get persisted so playlists survive source churn. M1 lands the provider behind `CATALOG_YTM_ENABLED` (default `false`) with a 24 h cache, persistence hooks, and a `degraded` flag on catalog responses when the resolver is down; the extraction sidecar itself is out of M1 scope.
 3. *(later)* **`LicensedProvider`** — if direct artist/label deals ever happen, plug in without touching clients.
 
 **Stream delivery:** `GET /v1/tracks/:id/stream` returns **302 → signed, ~4 h TTL URL** of the upstream stream (zero egress cost for us). A `?proxy=1` mode through our server exists for own-catalog files and for caching popular streams. Stream URLs are resolved lazily at play time and refreshed on 403.
@@ -143,9 +143,9 @@ Offset is user-adjustable in Settings (−2 s … +2 s, default −500 ms). Long
 | Table | Key columns | Notes |
 |-------|-------------|-------|
 | `Device` | id (uuid, pk), display_name, platform, api_key_hash, created_at, last_seen_at | The "user". No email, no password |
-| `Artist` | id, name, bio, art_url, is_verified, source, external_id | `source` = own \| ytm |
-| `Album` | id, title, artist_id →, type (album/single/ep), release_date, art_url | |
-| `Track` | id, title, artist_id →, album_id →?, duration_ms, has_lyrics, play_count, source, external_id, explicit | Unique on (source, external_id) |
+| `Artist` | id, name, bio, art_url, is_verified, source, external_id, **genres (String[])** | `source` = own \| ytm; M1 adds the genre array (no Genre table) |
+| `Album` | id, title, artist_id →, type (album/single/ep), release_date, art_url, **source, external_id** | M1 adds source/external_id; unique on (source, external_id) |
+| `Track` | id, title, artist_id →, album_id →?, duration_ms, has_lyrics, play_count, source, external_id, explicit, **genres (String[]), track_number, art_url** | Unique on (source, external_id); M1 adds the genre array, track number, and per-track art |
 | `Lyrics` | track_id → (pk), lrc_text, plain_text, offset_ms (default −500), synced (bool), source | |
 | `Playlist` | id, device_id →, name, description, cover_url, is_public, sort_order, created_at, updated_at | |
 | `PlaylistTrack` | (playlist_id, position) pk, track_id →, added_at | position gaps of 10 for cheap reorder |
@@ -172,7 +172,7 @@ All requests carry `X-Device-Key` (issued once at registration). Errors use RFC 
 | `GET /v1/search/suggest?q=` | Prefix suggestions (< 300 ms, cached) |
 | `GET /v1/search?q=&type=&limit=&offset=` | Typed results |
 | `GET /v1/browse/genres` | Genre/category tiles |
-| `GET /v1/browse/genres/:id` | Playlists for a genre |
+| `GET /v1/browse/genres/:id` | Genre + its track list |
 | `GET /v1/stations/:seed` | Radio track list |
 | `GET /v1/tracks/:id` | Track metadata |
 | `GET /v1/tracks/:id/stream` | 302 → signed stream URL |
@@ -197,7 +197,7 @@ All requests carry `X-Device-Key` (issued once at registration). Errors use RFC 
 | `GET /v1/artists/:id/similar` | Similar artists (taste-space neighbors) (M5) |
 | `GET /v1/me/state` | Current listener state + signal summary (M5) |
 
-OpenAPI 3.1 spec is an M0 deliverable (single source of truth for `packages/api-types`). All 29 contracts are declared now; the five personalization endpoints are implemented in M5 together with the nightly scoring job (D-011), while the core 24 ship in M0.
+OpenAPI 3.1 spec is an M0 deliverable (single source of truth for `packages/api-types`). All 29 contracts are declared now; the five personalization endpoints are implemented in M5 together with the nightly scoring job (D-011). **M1 implementation status (2026-11-22):** the catalog/search slice is live and tested against Postgres — devices, home, suggest, search (artist header + type chips), browse genres and genre detail, stations, artist, album, track, listen events, recents (28 paths / 27 schemas). Playback (`stream`, `lyrics`), playlists, likes, library and sync ship in M2–M4.
 
 ## 9. Sync strategy (no-login, local-first)
 

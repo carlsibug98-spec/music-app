@@ -6,11 +6,12 @@ info:
     Private music streaming API (no login — device-key auth, blueprint Ch. 5).
 
     M0 skeleton: all 29 v1 endpoint contracts are declared (28 paths;
-    likes and library each combine PUT/DELETE into one contract row);
-    /healthz and /v1/devices are implemented and fully specified. Others
-    carry their contracts (request/response shapes) and are implemented in
-    M1–M5 as the roadmap dictates. Keep this file and @resona/api-types in
-    sync.
+    likes and library each combine PUT/DELETE into one contract row).
+    M1 implements device registration, catalog, search, browse, home,
+    stations, listen capture, and recents. Playlist/library/personalization/
+    chart paths carry their contracts (request/response shapes) and are
+    implemented in M2–M5 as the roadmap dictates. Keep this file and
+    @resona/api-types in sync.
 servers:
   - url: http://localhost:3000
     description: local dev
@@ -66,9 +67,18 @@ paths:
   /v1/home:
     get:
       tags: [home]
-      summary: Personalized home sections (shelf contracts — blueprint Ch. 8)
+      summary: Personalized home rows for this device
+      description: |
+        Assembles the M1 home: greeting, two-column quick grid, and the
+        recent-rotation / made-for-you / new-releases / artists-to-know /
+        browse-genres rows. Empty rows are omitted.
       responses:
-        "200": { description: Shelf payload (M5) }
+        "200":
+          description: Home payload
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HomeResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
 
   /v1/me/taste:
     post:
@@ -100,46 +110,87 @@ paths:
   /v1/search/suggest:
     get:
       tags: [search]
-      summary: Prefix suggestions (target < 300 ms, cached)
+      summary: Prefix suggestions (target < 300 ms, cached 60 s)
       parameters:
-        - { name: q, in: query, required: true, schema: { type: string } }
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 100 }
       responses:
-        "200": { description: Suggestion list (M1) }
+        "200":
+          description: Suggestion list (at most 8 rows; first row submits the query)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SearchSuggestResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationError" }
 
   /v1/search:
     get:
       tags: [search]
       summary: Typed search results
       parameters:
-        - { name: q, in: query, required: true, schema: { type: string } }
-        - { name: type, in: query, schema: { type: string, enum: [song, album, artist, playlist] } }
-        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50 } }
-        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 100 }
+        - name: type
+          in: query
+          schema: { type: string, enum: [song, album, artist, playlist] }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - name: offset
+          in: query
+          schema: { type: integer, minimum: 0, default: 0 }
       responses:
-        "200": { description: Result page (M1) }
+        "200":
+          description: Result page (limit/offset apply per group)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SearchResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationError" }
 
   /v1/browse/genres:
     get:
       tags: [catalog]
-      summary: Genre/category tiles
+      summary: Genre/category tiles (featured first, OPM leads)
       responses:
-        "200": { description: Genre list (M1) }
+        "200":
+          description: Genre list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GenresResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
 
   /v1/browse/genres/{id}:
     get:
       tags: [catalog]
-      summary: Playlists for a genre
+      summary: Tracks for a genre
       parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        "200": { description: Genre playlists (M1) }
+        "200":
+          description: Genre detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GenreDetailResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /v1/stations/{seed}:
     get:
       tags: [catalog]
-      summary: Radio track list for a seed (artist/track/genre)
+      summary: Radio track list for a seed (artist/track/genre/search text)
       parameters: [{ $ref: "#/components/parameters/Seed" }]
       responses:
-        "200": { description: Station tracks (M2) }
+        "200":
+          description: Station tracks
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StationResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /v1/tracks/{id}:
     get:
@@ -147,7 +198,13 @@ paths:
       summary: Track metadata
       parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        "200": { description: Track detail (M1) }
+        "200":
+          description: Track detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackDetail" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /v1/tracks/{id}/stream:
     get:
@@ -171,7 +228,13 @@ paths:
       summary: Artist + top tracks + releases
       parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        "200": { description: Artist detail (M1) }
+        "200":
+          description: Artist detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ArtistDetail" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /v1/artists/{id}/similar:
     get:
@@ -187,7 +250,13 @@ paths:
       summary: Album + tracks
       parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
-        "200": { description: Album detail (M1) }
+        "200":
+          description: Album detail (tracks in album order)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AlbumDetail" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /v1/charts:
     get:
@@ -303,15 +372,31 @@ paths:
     post:
       tags: [signals]
       summary: Batched listen events (offline replay; feeds personalization M5)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ListenEventsRequest" }
       responses:
-        "202": { description: Accepted (M2) }
+        "202":
+          description: Events accepted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListenEventsResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationError" }
 
   /v1/recents:
     get:
       tags: [signals]
-      summary: Grouped recents feed
+      summary: Grouped recents feed (today / yesterday / older ISO days)
       responses:
-        "200": { description: Recents (M2) }
+        "200":
+          description: Recents
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecentsResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
 
 components:
   securitySchemes:
@@ -350,6 +435,11 @@ components:
           schema: { $ref: "#/components/schemas/Problem" }
     NotFound:
       description: Not found
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    Unauthorized:
+      description: Missing or unknown X-Device-Key
       content:
         application/problem+json:
           schema: { $ref: "#/components/schemas/Problem" }
@@ -403,3 +493,274 @@ components:
         display_name: { type: string }
         platform: { type: string, enum: [ios, android] }
         created_at: { type: string, format: date-time }
+
+    # ---------- Catalog ----------
+
+    TrackSummary:
+      type: object
+      required: [id, title, artist_id, artist_name, duration_ms, has_lyrics, explicit, play_count, genres]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        artist_id: { type: string, format: uuid }
+        artist_name: { type: string }
+        album_id: { type: [string, "null"], format: uuid }
+        album_title: { type: [string, "null"] }
+        duration_ms: { type: integer, minimum: 0 }
+        has_lyrics: { type: boolean }
+        explicit: { type: boolean }
+        art_url: { type: [string, "null"] }
+        play_count: { type: integer, minimum: 0 }
+        genres:
+          type: array
+          items: { type: string }
+
+    AlbumSummary:
+      type: object
+      required: [id, title, artist_id, artist_name, type, track_count]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        artist_id: { type: string, format: uuid }
+        artist_name: { type: string }
+        type: { type: string, enum: [album, single, ep] }
+        release_date: { type: [string, "null"], format: date }
+        art_url: { type: [string, "null"] }
+        track_count: { type: integer, minimum: 0 }
+
+    ArtistSummary:
+      type: object
+      required: [id, name, is_verified, genres]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        art_url: { type: [string, "null"] }
+        is_verified: { type: boolean }
+        genres:
+          type: array
+          items: { type: string }
+
+    ArtistDetail:
+      allOf:
+        - $ref: "#/components/schemas/ArtistSummary"
+        - type: object
+          required: [monthly_listeners, top_tracks, releases]
+          properties:
+            bio: { type: [string, "null"] }
+            monthly_listeners: { type: integer, minimum: 0 }
+            top_tracks:
+              type: array
+              items: { $ref: "#/components/schemas/TrackSummary" }
+            releases:
+              type: array
+              items: { $ref: "#/components/schemas/AlbumSummary" }
+
+    AlbumDetail:
+      allOf:
+        - $ref: "#/components/schemas/AlbumSummary"
+        - type: object
+          required: [tracks, more_by_artist]
+          properties:
+            tracks:
+              type: array
+              items: { $ref: "#/components/schemas/TrackSummary" }
+            more_by_artist:
+              type: array
+              items: { $ref: "#/components/schemas/AlbumSummary" }
+
+    TrackDetail:
+      allOf:
+        - $ref: "#/components/schemas/TrackSummary"
+        - type: object
+          required: [lyrics_available]
+          properties:
+            lyrics_available: { type: boolean }
+
+    # ---------- Search ----------
+
+    SearchSuggestion:
+      type: object
+      required: [type, text]
+      properties:
+        type: { type: string, enum: [query, song, album, artist] }
+        text: { type: string }
+        subtitle: { type: string }
+        id: { type: string, format: uuid }
+
+    SearchSuggestResponse:
+      type: object
+      required: [query, suggestions]
+      properties:
+        query: { type: string }
+        suggestions:
+          type: array
+          maxItems: 8
+          items: { $ref: "#/components/schemas/SearchSuggestion" }
+
+    PlaylistSummary:
+      type: object
+      required: [id, name, owner, track_count]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        owner: { type: string }
+        track_count: { type: integer, minimum: 0 }
+        art_url: { type: [string, "null"] }
+
+    SearchResponse:
+      type: object
+      required: [query, type, limit, offset, total, degraded, songs, albums, artists, playlists]
+      properties:
+        query: { type: string }
+        type: { type: string, enum: [all, song, album, artist, playlist] }
+        limit: { type: integer }
+        offset: { type: integer }
+        total:
+          type: integer
+          description: Combined count across returned groups, before pagination.
+        degraded:
+          type: boolean
+          description: True when the YTM adapter failed and own/cached rows were served.
+        artist_header:
+          oneOf:
+            - { $ref: "#/components/schemas/ArtistSummary" }
+            - { type: "null" }
+        songs:
+          type: array
+          items: { $ref: "#/components/schemas/TrackSummary" }
+        albums:
+          type: array
+          items: { $ref: "#/components/schemas/AlbumSummary" }
+        artists:
+          type: array
+          items: { $ref: "#/components/schemas/ArtistSummary" }
+        playlists:
+          type: array
+          items: { $ref: "#/components/schemas/PlaylistSummary" }
+
+    # ---------- Home & browse ----------
+
+    CatalogCard:
+      type: object
+      required: [kind, id, title]
+      properties:
+        kind: { type: string, enum: [track, album, artist, genre] }
+        id: { type: string }
+        title: { type: string }
+        subtitle: { type: string }
+        art_url: { type: [string, "null"] }
+
+    HomeRow:
+      type: object
+      required: [key, title, items]
+      properties:
+        key: { type: string }
+        title: { type: string }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/CatalogCard" }
+
+    HomeResponse:
+      type: object
+      required: [greeting, quick_grid, rows]
+      properties:
+        greeting: { type: string }
+        quick_grid:
+          type: array
+          items: { $ref: "#/components/schemas/CatalogCard" }
+        rows:
+          type: array
+          items: { $ref: "#/components/schemas/HomeRow" }
+
+    GenreSummary:
+      type: object
+      required: [id, name, featured, track_count]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        featured: { type: boolean }
+        track_count: { type: integer, minimum: 0 }
+        art_url: { type: [string, "null"] }
+
+    GenresResponse:
+      type: object
+      required: [genres]
+      properties:
+        genres:
+          type: array
+          items: { $ref: "#/components/schemas/GenreSummary" }
+
+    GenreDetailResponse:
+      type: object
+      required: [genre, tracks]
+      properties:
+        genre: { $ref: "#/components/schemas/GenreSummary" }
+        tracks:
+          type: array
+          items: { $ref: "#/components/schemas/TrackSummary" }
+
+    StationResponse:
+      type: object
+      required: [seed, title, description, tracks]
+      properties:
+        seed: { type: string }
+        title: { type: string }
+        description: { type: string }
+        tracks:
+          type: array
+          items: { $ref: "#/components/schemas/TrackSummary" }
+
+    # ---------- Signals ----------
+
+    ListenEventInput:
+      type: object
+      required: [track_id, ms_played, completed]
+      properties:
+        track_id: { type: string, format: uuid }
+        played_at: { type: string, format: date-time }
+        ms_played: { type: integer, minimum: 0, maximum: 86400000 }
+        completed: { type: boolean }
+
+    ListenEventsRequest:
+      type: object
+      required: [events]
+      properties:
+        events:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items: { $ref: "#/components/schemas/ListenEventInput" }
+
+    ListenEventsResponse:
+      type: object
+      required: [accepted]
+      properties:
+        accepted: { type: integer, minimum: 0 }
+
+    RecentItem:
+      type: object
+      required: [track, played_at, ms_played, completed]
+      properties:
+        track: { $ref: "#/components/schemas/TrackSummary" }
+        played_at: { type: string, format: date-time }
+        ms_played: { type: integer, minimum: 0 }
+        completed: { type: boolean }
+
+    RecentGroup:
+      type: object
+      required: [day, items]
+      properties:
+        day:
+          type: string
+          description: '"today", "yesterday", or an ISO date for older groups.'
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/RecentItem" }
+
+    RecentsResponse:
+      type: object
+      required: [groups]
+      properties:
+        groups:
+          type: array
+          items: { $ref: "#/components/schemas/RecentGroup" }

@@ -1,14 +1,23 @@
 /**
- * App factory — wire routes here; server.ts only listens.
+ * App factory — wire routes here; server.ts owns Prisma and listening.
  */
 import express, { type Request, type Response, type NextFunction } from 'express';
 import helmet from 'helmet';
+import type { CatalogService } from './catalog/catalogService.js';
+import { requireDevice } from './auth/requireDevice.js';
 import { problemHandler } from './lib/errors.js';
-import { healthzRouter } from './routes/healthz.js';
+import { mountLocalMedia } from './media.js';
+import { catalogRouter } from './routes/catalog.js';
 import { devicesRouter } from './routes/devices.js';
-import { InMemoryDeviceStore } from './stores/deviceStore.js';
+import { healthzRouter } from './routes/healthz.js';
+import type { DeviceStore } from './stores/deviceStore.js';
 
-export function createApp() {
+export interface AppDeps {
+  deviceStore: DeviceStore;
+  catalog: CatalogService;
+}
+
+export function createApp(deps: AppDeps) {
   const app = express();
   app.disable('x-powered-by');
 
@@ -23,7 +32,10 @@ export function createApp() {
 
   // Routes
   app.use(healthzRouter);
-  app.use('/v1/devices', devicesRouter(new InMemoryDeviceStore()));
+  app.use('/v1/devices', devicesRouter(deps.deviceStore));
+  app.use('/v1', requireDevice(deps.deviceStore), catalogRouter(deps.catalog));
+
+  mountLocalMedia(app);
 
   // 404 (RFC 7807)
   app.use((_req: Request, res: Response) => {
@@ -34,11 +46,11 @@ export function createApp() {
         type: 'https://resona.dev/problems/not-found',
         title: 'Not found',
         status: 404,
+        detail: 'The requested resource does not exist.',
         trace_id: res.locals.traceId,
       });
   });
 
-  // Error envelope — must be last.
   app.use(problemHandler);
 
   return app;

@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Resona">
+        android:theme="@style/Theme.Resona"
+        android:usesCleartextTraffic="true">
+
+        <!--
+          usesCleartextTraffic is a development affordance for the local API
+          (http://127.0.0.1:3000 via `adb reverse`). Production moves to HTTPS
+          before the M6 store build.
+        -->
 
         <activity
             android:name=".MainActivity"

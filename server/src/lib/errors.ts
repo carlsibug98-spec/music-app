@@ -26,6 +26,9 @@ export const badRequest = (detail: string) =>
 export const notFound = () =>
   new ApiError(404, `${PROBLEM_BASE}/not-found`, 'Not found', 'The requested resource does not exist.');
 
+export const unauthorized = (detail = 'A valid X-Device-Key header is required.') =>
+  new ApiError(401, `${PROBLEM_BASE}/unauthorized`, 'Unauthorized', detail);
+
 export const validationFailed = (zerr: ZodError) =>
   new ApiError(
     422,
