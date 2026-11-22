@@ -1,0 +1,349 @@
+openapi: 3.1.0
+info:
+  title: Resona API
+  version: 0.1.0
+  description: |
+    Private music streaming API (no login — device-key auth, blueprint Ch. 5).
+
+    M0 skeleton: all 24 v1 endpoints are declared; /healthz and
+    /v1/devices are implemented and fully specified. Others carry their
+    contracts (request/response shapes) and are implemented in M1–M5 as
+    the roadmap dictates. Keep this file and @resona/api-types in sync.
+servers:
+  - url: http://localhost:3000
+    description: local dev
+
+security:
+  - DeviceKey: []
+
+tags:
+  - name: system
+  - name: devices
+  - name: home
+  - name: search
+  - name: catalog
+  - name: playlists
+  - name: library
+  - name: signals
+
+paths:
+  /healthz:
+    get:
+      tags: [system]
+      summary: Liveness probe
+      security: []
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+
+  /v1/devices:
+    post:
+      tags: [devices]
+      summary: Register a device (silent, no login)
+      description: Returns the device key exactly once; clients persist it in Keychain/EncryptedSharedPreferences.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DeviceRegistrationRequest" }
+      responses:
+        "201":
+          description: Registered
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeviceRegistrationResponse" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /v1/home:
+    get:
+      tags: [home]
+      summary: Personalized home sections (shelf contracts — blueprint Ch. 8)
+      responses:
+        "200": { description: Shelf payload (M5) }
+
+  /v1/search/suggest:
+    get:
+      tags: [search]
+      summary: Prefix suggestions (target < 300 ms, cached)
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Suggestion list (M1) }
+
+  /v1/search:
+    get:
+      tags: [search]
+      summary: Typed search results
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string } }
+        - { name: type, in: query, schema: { type: string, enum: [song, album, artist, playlist] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+      responses:
+        "200": { description: Result page (M1) }
+
+  /v1/browse/genres:
+    get:
+      tags: [catalog]
+      summary: Genre/category tiles
+      responses:
+        "200": { description: Genre list (M1) }
+
+  /v1/browse/genres/{id}:
+    get:
+      tags: [catalog]
+      summary: Playlists for a genre
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Genre playlists (M1) }
+
+  /v1/stations/{seed}:
+    get:
+      tags: [catalog]
+      summary: Radio track list for a seed (artist/track/genre)
+      parameters: [{ $ref: "#/components/parameters/Seed" }]
+      responses:
+        "200": { description: Station tracks (M2) }
+
+  /v1/tracks/{id}:
+    get:
+      tags: [catalog]
+      summary: Track metadata
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Track detail (M1) }
+
+  /v1/tracks/{id}/stream:
+    get:
+      tags: [catalog]
+      summary: 302 to a signed, ~4 h TTL stream URL
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "302": { description: Redirect to stream (M2) }
+
+  /v1/tracks/{id}/lyrics:
+    get:
+      tags: [catalog]
+      summary: LRC + offset (P4 — lead audio 0.5 s)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Lyrics payload (M4) }
+
+  /v1/artists/{id}:
+    get:
+      tags: [catalog]
+      summary: Artist + top tracks + releases
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Artist detail (M1) }
+
+  /v1/albums/{id}:
+    get:
+      tags: [catalog]
+      summary: Album + tracks
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Album detail (M1) }
+
+  /v1/playlists:
+    get:
+      tags: [playlists]
+      summary: My playlists
+      responses:
+        "200": { description: Playlist list (M3) }
+    post:
+      tags: [playlists]
+      summary: Create playlist
+      responses:
+        "201": { description: Created (M3) }
+
+  /v1/playlists/{id}:
+    patch:
+      tags: [playlists]
+      summary: Rename / description / cover / privacy / sort
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Updated (M3) }
+    delete:
+      tags: [playlists]
+      summary: Delete playlist
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "204": { description: Deleted (M3) }
+
+  /v1/playlists/{id}/tracks:
+    post:
+      tags: [playlists]
+      summary: Add tracks {track_ids[], position?}
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "201": { description: Added (M3) }
+
+  /v1/playlists/{id}/tracks/{trackId}:
+    delete:
+      tags: [playlists]
+      summary: Remove track
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+        - { $ref: "#/components/parameters/TrackId" }
+      responses:
+        "204": { description: Removed (M3) }
+
+  /v1/playlists/{id}/order:
+    patch:
+      tags: [playlists]
+      summary: Persist new order {track_id, position}[]
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Reordered (M3) }
+
+  /v1/likes/{trackId}:
+    put:
+      tags: [library]
+      summary: Like a track
+      parameters: [{ $ref: "#/components/parameters/TrackId" }]
+      responses:
+        "204": { description: Liked (M3) }
+    delete:
+      tags: [library]
+      summary: Unlike a track
+      parameters: [{ $ref: "#/components/parameters/TrackId" }]
+      responses:
+        "204": { description: Unliked (M3) }
+
+  /v1/library:
+    get:
+      tags: [library]
+      summary: Playlists, followed artists, saved albums
+      parameters:
+        - { name: include, in: query, schema: { type: string, enum: [playlists, artists, albums] } }
+      responses:
+        "200": { description: Library (M3) }
+
+  /v1/library/{type}/{id}:
+    put:
+      tags: [library]
+      summary: Follow / save
+      parameters:
+        - { name: type, in: path, schema: { type: string, enum: [artist, album, playlist] } }
+        - { $ref: "#/components/parameters/Id" }
+      responses:
+        "204": { description: Saved (M3) }
+    delete:
+      tags: [library]
+      summary: Unfollow / unsave
+      parameters:
+        - { name: type, in: path, schema: { type: string, enum: [artist, album, playlist] } }
+        - { $ref: "#/components/parameters/Id" }
+      responses:
+        "204": { description: Removed (M3) }
+
+  /v1/events/listen:
+    post:
+      tags: [signals]
+      summary: Batched listen events (offline replay; feeds personalization M5)
+      responses:
+        "202": { description: Accepted (M2) }
+
+  /v1/recents:
+    get:
+      tags: [signals]
+      summary: Grouped recents feed
+      responses:
+        "200": { description: Recents (M2) }
+
+components:
+  securitySchemes:
+    DeviceKey:
+      type: apiKey
+      in: header
+      name: X-Device-Key
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    TrackId:
+      name: trackId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    Seed:
+      name: seed
+      in: path
+      required: true
+      schema: { type: string }
+
+  responses:
+    BadRequest:
+      description: Malformed request
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    ValidationError:
+      description: Validation failed
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+    NotFound:
+      description: Not found
+      content:
+        application/problem+json:
+          schema: { $ref: "#/components/schemas/Problem" }
+
+  schemas:
+    Health:
+      type: object
+      required: [status, version, uptime_s]
+      properties:
+        status: { type: string, const: ok }
+        version: { type: string }
+        uptime_s: { type: integer }
+
+    Problem:
+      description: RFC 7807 error envelope
+      type: object
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              path: { type: string }
+              message: { type: string }
+        trace_id: { type: string, format: uuid }
+
+    DeviceRegistrationRequest:
+      type: object
+      required: [display_name, platform]
+      properties:
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 32
+          description: Trimmed server-side.
+        platform: { type: string, enum: [ios, android] }
+
+    DeviceRegistrationResponse:
+      type: object
+      required: [device_id, device_key, display_name, platform, created_at]
+      properties:
+        device_id: { type: string, format: uuid }
+        device_key:
+          type: string
+          description: 43-char base64url (32 bytes); returned exactly once.
+        display_name: { type: string }
+        platform: { type: string, enum: [ios, android] }
+        created_at: { type: string, format: date-time }

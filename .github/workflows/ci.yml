@@ -1,0 +1,73 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  server:
+    name: Server — lint, typecheck, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint -w @resona/server
+
+      - name: Typecheck
+        run: npm run typecheck -w @resona/server
+
+      - name: Validate Prisma schema
+        run: npx prisma validate --schema server/prisma/schema.prisma
+        env:
+          DATABASE_URL: postgresql://x:x@localhost:5432/x
+
+      - name: Test
+        run: npm test -w @resona/server
+
+      - name: Dependency audit (non-blocking)
+        run: npm audit --omit=dev || true
+
+  android:
+    name: Android — assemble debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: apps/android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+          cache-read-only: false
+
+      - name: Assemble debug APK
+        run: gradle assembleDebug --no-daemon
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: resona-debug-apk
+          path: apps/android/app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+
+  # iOS build intentionally omitted: macOS runners are not free on private
+  # repos (10x minute multiplier). Build locally via xcodegen + Xcode, or
+  # enable this job if the repo goes public. Zero-budget rule (blueprint Ch. 13).
