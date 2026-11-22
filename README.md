@@ -1,10 +1,10 @@
-# Tugtugin (working title)
+# Tugtugin
 
 A **free, ad-free, no-login music app** for iOS and Android, built natively, with synced lyrics that lead the vocal by 0.5 seconds.
 
 You open it, type your name once, and start listening. No account, no email, no ads, no premium tier. Songs stream (and download for free) through the same source OpenSpot and Musify use — YouTube / YouTube Music — behind a swappable server-side adapter, with an own-catalog fallback that is always store-safe.
 
-> **Tugtugin** is Tagalog for "music / the playing of instruments" — a working title; final name is decision D-009 (see `PROGRESS.md`).
+> **Tugtugin** is Tagalog for "music / the playing of instruments." Final name per D-009; Resona stays the internal code identity until the M6 rename.
 
 ## Status
 

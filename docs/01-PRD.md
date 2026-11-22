@@ -1,6 +1,6 @@
 # 01 — Product Requirements Document (PRD)
 
-**Project:** Tugtugin (working title) — free music app
+**Project:** Tugtugin — free music app
 **Version:** 1.1 · **Date:** 2026-11-22 · **Owner:** carlsibug98-spec (solo builder)
 **Status:** Approved for M0 · v1.1 = synced to the consolidated blueprint (FR-16..21, S-31..S-33, D-011 personalization)
 

@@ -77,7 +77,7 @@ Gantt: `docs/diagrams/roadmap-gantt.png` (regenerated for v1.1).
 
 **Build:** polish pass on motion specs (doc 03 §4) · crash reporting + 2-week dogfood beta (you + 5 friends via TestFlight/Play internal) · performance pass against NFR table · store-listing assets · de-branding checklist (doc 03 §8) · README quick-start · v1.0 tag + GitHub Release with APK.
 
-**Definition of done:** all PRD user stories pass on both platforms; crash-free ≥ 99.5 % over the beta window; a friend can install and play a song without help. Name (D-009) and license (D-010) must be decided before first store upload.
+**Definition of done:** all PRD user stories pass on both platforms; crash-free ≥ 99.5 % over the beta window; a friend can install and play a song without help. Name (D-009, **Tugtugin**) and license (D-010, **MIT**) are decided; trademark/store-name clearance remains a pre-upload check.
 
 ---
 
