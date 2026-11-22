@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: resona-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: resona
+      POSTGRES_PASSWORD: resona
+      POSTGRES_DB: resona
+    ports:
+      - "5432:5432"
+    volumes:
+      - resona_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U resona -d resona"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  resona_pgdata:

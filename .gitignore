@@ -1,28 +1,37 @@
-# macOS
-.DS_Store
-
-# Node / backend
+# Dependencies
 node_modules/
+
+# Builds
 dist/
 build/
+*.tsbuildinfo
+
+# Env & secrets
 .env
-.env.*
-*.log
+.env.local
+server/.env
 
-# Xcode / iOS
-xcuserdata/
-DerivedData/
-*.ipa
+# Local media (own-catalog test tracks — never committed)
+local-media/*
 
-# Android / Gradle
+# Android
 .gradle/
 local.properties
 *.apk
 *.aab
+apps/android/app/build/
+apps/android/build/
+apps/android/.kotlin/
 
-# IDE
+# iOS (xcodeproj is generated from project.yml via XcodeGen)
+apps/ios/*.xcodeproj/
+apps/ios/DerivedData/
+xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
 .idea/
 .vscode/
-
-# Sandbox artifacts - never commit tokens or credentials
-*token*
