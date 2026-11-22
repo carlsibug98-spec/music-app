@@ -28,19 +28,19 @@ G900, G700, G500, G400, G300 = "#111827", "#374151", "#6B7280", "#9CA3AF", "#D1D
 
 # (name, week_start, duration_weeks, date_range, color)
 MILESTONES = [
-    ("M0  Foundations",          0,  2, "Nov 23 - Dec 6",   "#C3D0DE"),
-    ("M1  Playback core",        2,  6, "Dec 7 - Jan 17",   "#A8BCCE"),
-    ("M2  Catalog / Search / Home", 8, 5, "Jan 18 - Feb 21", "#8DA6BD"),
-    ("M3  Library & playlists",  13, 5, "Feb 22 - Mar 28",  "#7290AC"),
-    ("M4  Lyrics / downloads",   18, 5, "Mar 29 - May 2",   "#577A9B"),
-    ("M5  Beta & release prep",  23, 3, "May 3 - May 23",   "#3A6489"),
-    ("Buffer (absorbs slips)",   26, 2, "May 24 - Jun 6",   "#E2E6EC"),
+    ("M0  Foundations",             0,  4, "Nov 23 - Dec 20",  "#C3D0DE"),
+    ("M1  Catalog / Search",        4,  4, "Dec 21 - Jan 17",  "#A8BCCE"),
+    ("M2  Playback core",           8,  5, "Jan 18 - Feb 21",  "#8DA6BD"),
+    ("M3  Library / taste picker", 13,  4, "Feb 22 - Mar 21",  "#7290AC"),
+    ("M4  Lyrics / offline",       17,  4, "Mar 22 - Apr 18",  "#577A9B"),
+    ("M5  Personalization / charts", 21, 3, "Apr 19 - May 9",  "#3A6489"),
+    ("M6  Deploy / friend rollout", 24, 2, "May 10 - May 23", "#2A4E75"),
 ]
 
 # Month boundaries in week units (week 0 starts Mon Nov 23, 2026)
 MONTHS = [
     (1.14, "Dec"), (5.57, "Jan"), (10.0, "Feb"), (14.0, "Mar"),
-    (18.43, "Apr"), (22.71, "May"), (27.14, "Jun"),
+    (18.43, "Apr"), (22.71, "May"),
 ]
 
 fig, ax = plt.subplots(figsize=(12, 5.2), constrained_layout=True)
@@ -51,7 +51,7 @@ for (name, start, dur, dates, color), y in zip(MILESTONES, y_positions):
     ax.barh(y, dur, left=start, height=0.62, color=color,
             edgecolor="white", linewidth=0.8, zorder=3,
             hatch="///" if is_buffer else None)
-    text_color = "#FFFFFF" if color in ("#3A6489", "#577A9B") else G700
+    text_color = "#FFFFFF" if color in ("#3A6489", "#577A9B", "#2A4E75") else G700
     # date-range label only (x-axis already carries week numbers);
     # centered inside when the bar is wide enough, otherwise to the right
     if dur >= 5:
@@ -69,16 +69,16 @@ for x, month in MONTHS:
     ax.text(x + 0.15, len(MILESTONES) - 0.45, month, fontsize=9,
             color=G500, va="top", zorder=2)
 
-ax.set_xlim(0, 30.8)
+ax.set_xlim(0, 27.4)
 ax.set_ylim(-0.6, len(MILESTONES) - 0.4 + 0.4)
-ax.set_xticks(range(0, 29, 4))
-ax.set_xticklabels([f"wk {w + 1}" if w else "wk 1" for w in range(0, 29, 4)])
+ax.set_xticks(range(0, 27, 4))
+ax.set_xticklabels([f"wk {w + 1}" if w else "wk 1" for w in range(0, 27, 4)])
 ax.xaxis.grid(True, alpha=0.08, color=G300)
 ax.set_axisbelow(True)
-ax.set_title("Solo Part-Time Roadmap - 28 Weeks (Nov 23, 2026 - Jun 6, 2027)",
+ax.set_title("Solo Part-Time Roadmap - 26 Weeks (Nov 23, 2026 - May 23, 2027)",
              loc="left", fontsize=14, fontweight="bold", color=G900, pad=14)
 
-out = "/home/z/my-project/music-app/docs/diagrams/roadmap-gantt.png"
+out = "/home/z/my-project/scripts/bp11/roadmap-gantt.png"
 fig.savefig(out, dpi=200, facecolor="white")
 plt.close(fig)
 import os

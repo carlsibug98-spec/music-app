@@ -1,7 +1,8 @@
 # 02 — System Architecture & Technical Design
 
-**Version:** 1.0 · **Date:** 2026-11-22
-**Companion diagrams:** `docs/diagrams/architecture.png`, `docs/diagrams/data-model.png`
+**Version:** 1.1 · **Date:** 2026-11-22
+**Companion diagrams:** `docs/diagrams/architecture.png`, `docs/diagrams/data-model.png`, `docs/diagrams/roadmap-gantt.png`, `docs/diagrams/personalization-pipeline.png`
+**v1.1 = synced to the consolidated blueprint:** five derived personalization tables (§7), five personalization endpoints (§8). Core 11 tables / 24 endpoints unchanged.
 
 ---
 
@@ -152,10 +153,15 @@ Offset is user-adjustable in Settings (−2 s … +2 s, default −500 ms). Long
 | `LibraryItem` | (device_id, item_type, item_id) pk, saved_at | follows + album/playlist saves |
 | `ListenEvent` | id, device_id →, track_id →, played_at, ms_played | recents + home feed |
 | `RecentSearch` | id, device_id →, query, submitted_at, result_type | search history |
+| `TasteProfile` | (device_id, artist_id) pk, plays, skips, likes, last_played_at, affinity | **derived, lands M5** — seeded by taste picker (D-011) |
+| `ListenerState` | device_id (pk), state, signals (json), entered_at | **derived, lands M5** — new / casual / regular / super-fan |
+| `DailyListenStat` | (device_id, day) pk, plays, minutes | **derived, lands M5** — nightly rollup of ListenEvent |
+| `ShelfSnapshot` | (device_id, shelf_id, rank) pk, payload (json), built_at | **derived, lands M5** — adaptive home output |
+| `ChartSnapshot` | (scope, window_start, rank) pk, track_id →, plays | **derived, lands M5** — global + personal Top 50 |
 
-ER diagram: `docs/diagrams/data-model.png`.
+ER diagram: `docs/diagrams/data-model.png` (core tables; the five derived personalization tables are specified in blueprint v1.1 Ch. 4 and land in the Prisma schema at M5).
 
-## 8. API surface (v1) — 24 endpoints
+## 8. API surface (v1) — 29 endpoints (24 core + 5 personalization)
 
 All requests carry `X-Device-Key` (issued once at registration). Errors use RFC 7807 JSON. Everything is versioned `/v1`.
 
@@ -185,8 +191,13 @@ All requests carry `X-Device-Key` (issued once at registration). Errors use RFC 
 | `PUT /v1/library/:type/:id` · `DELETE …` | Follow / save / unfollow / unsave |
 | `POST /v1/events/listen` | Batched listen events (offline replay) |
 | `GET /v1/recents` | Grouped recents feed |
+| `POST /v1/me/taste` | Taste picker submit {artist_ids[]} (≥ 3) — seeds TasteProfile (M5) |
+| `GET /v1/home/shelves` | Adaptive home: shelves + payloads for the listener state (M5) |
+| `GET /v1/charts?scope=&window=` | Global or personal Top 50 snapshot (M5) |
+| `GET /v1/artists/:id/similar` | Similar artists (taste-space neighbors) (M5) |
+| `GET /v1/me/state` | Current listener state + signal summary (M5) |
 
-OpenAPI 3.1 spec is an M0 deliverable (single source of truth for `packages/api-types`).
+OpenAPI 3.1 spec is an M0 deliverable (single source of truth for `packages/api-types`). The five personalization endpoints land in M5 together with the nightly scoring job (D-011); the OpenAPI skeleton gains them then — the core 24 stay as shipped in M0.
 
 ## 9. Sync strategy (no-login, local-first)
 

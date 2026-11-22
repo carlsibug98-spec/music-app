@@ -267,7 +267,7 @@ story += h1_block("1. Executive Summary", body(
     "app for iOS and Android. It converts an existing 25-screen interactive mockup - a Spotify-style "
     "layout covering Home, Search, Now Playing, synced lyrics, playlists, artist and album pages, "
     "Library, profile and settings - into a concrete engineering program: one solo builder, working "
-    "evenings and weekends, shipping a working MVP in 28 weeks."))
+    "evenings and weekends, shipping a working MVP in 26 weeks."))
 story += body(
     "The product is defined by five non-negotiable principles, fixed before any code is written. "
     "First, <b>no login</b>: the app asks for a display name once and registers a device silently; "
@@ -279,25 +279,28 @@ story += body(
     "from YouTube / YouTube Music - but behind a server-side adapter with an own-catalog fallback, "
     "so the sourcing decision can never break the architecture.")
 story += stat_row([
-    ("25", "screens specced<br/>from the mockup"),
-    ("28", "weeks, solo<br/>part-time plan"),
-    ("24", "REST endpoints<br/>on the custom API"),
-    ("11", "tables in the<br/>PostgreSQL schema"),
+    ("28", "screens specced<br/>across the plan"),
+    ("26", "weeks, solo<br/>part-time plan"),
+    ("29", "REST endpoints<br/>on the custom API"),
+    ("16", "tables in the<br/>PostgreSQL schema"),
     ("-0.5 s", "default lyric<br/>lead offset"),
 ])
 story += body(
     "The document is organized to be used, not just read. Chapter 2 defines what is being built and "
     "what is deliberately deferred. Chapters 3 and 4 specify the system: two native clients (Swift "
-    "with SwiftUI, Kotlin with Jetpack Compose) over a custom Node.js API with PostgreSQL. Chapter 5 "
+    "with SwiftUI, Kotlin with Jetpack Compose) over a custom Node.js API with PostgreSQL; Chapter 4 "
+    "also carries the rules-based personalization engine - taste picker, listener states, adaptive "
+    "shelves and real charts - made first-class in v1.1 (decision D-011). Chapter 5 "
     "locks the design system - every color, size, radius and animation curve extracted from the "
-    "mockup. Chapter 6 sequences the build into six demoable milestones. Chapter 7 is the honest "
+    "mockup. Chapter 6 sequences the build into seven demoable milestones. Chapter 7 is the honest "
     "analysis of how OpenSpot and Musify actually source music and what that means legally and for "
-    "distribution. Chapter 8 scores the twelve risks that matter. The appendices carry the full "
+    "distribution. Chapter 8 scores the fourteen risks that matter. The appendices carry the full "
     "screen inventory and research sources.")
 story += body(
     "Everything in this blueprint also lives as living documents in the project repository, where "
     "progress is tracked milestone by milestone. The repository - not this PDF - is the source of "
-    "truth once construction starts; the PDF is the v1.0 snapshot of the plan.")
+    "truth once construction starts; the PDF is the v1.1 snapshot of the plan, committed to the "
+    "repository at docs/blueprints/.")
 
 # =============================================================== Chapter 2
 story += h1_block("2. Product Definition", body(
@@ -329,7 +332,8 @@ story += make_table(
 
 story.append(heading("2.2 Screen clusters and build priority", "h2"))
 story += body(
-    "The mockup's 25 states group into 20 screen clusters; each cluster ships in the milestone shown. "
+    "The mockup's 25 states, the added onboarding screen, and the three v1.1 personalization "
+    "screens (S-31..S-33) group into 23 screen clusters; each cluster ships in the milestone shown. "
     "The full state-by-state inventory is Appendix A. The one screen that does not exist in the "
     "mockup is Onboarding - a single name-entry field required by the no-login principle: type a "
     "name, tap go, device registers silently, Home appears with the quick grid filled.")
@@ -337,28 +341,31 @@ story += make_table(
     ["#", "Screen cluster", "Ships", "Key elements (from mockup)"],
     [
         ["1", "Onboarding - name entry", "M1", "Single field, no email or password, silent device registration"],
-        ["2", "Home", "M2", "Chips, 8-tile quick grid, recent rotation, card carousels, Show all links"],
-        ["3", "Search idle + browse", "M2", "Recents with remove, 5 feature categories, ~30 genre tiles"],
-        ["4", "Search typing + results", "M2", "Live suggestions, type chips, artist header card, result rows"],
-        ["5", "Now Playing", "M1", "Art, scrubber, shuffle/prev/play/next/sleep, lyrics preview card"],
+        ["2", "Home", "M1", "Chips, 8-tile quick grid, recent rotation, card carousels, Show all links"],
+        ["3", "Search idle + browse", "M1", "Recents with remove, 5 feature categories, ~30 genre tiles"],
+        ["4", "Search typing + results", "M1", "Live suggestions, type chips, artist header card, result rows"],
+        ["5", "Now Playing", "M2", "Art, scrubber, shuffle/prev/play/next/sleep, lyrics preview card"],
         ["6", "Full-screen lyrics", "M4", "Active/past/future states, tap-to-seek, instrumental rows"],
-        ["7", "Queue sheet", "M1/M4", "Now playing + next up, hold-to-reorder, swipe-to-remove"],
+        ["7", "Queue sheet", "M2/M4", "Now playing + next up, hold-to-reorder, swipe-to-remove"],
         ["8", "Track sheet + add-to-playlist", "M3", "Share, lyrics toggle, like, saved-in list, new playlist dialog"],
         ["9", "Playlist detail", "M3", "Gradient hero, action pills, tracks, recommended songs, refresh"],
         ["10", "Playlist edit + name & details", "M3", "Drag rows, cover with edit badge, private toggle, delete"],
         ["11", "Liked Songs + add", "M3", "Count, add-to-this-playlist row, most-played/songs tabs"],
-        ["12", "Artist page", "M2", "Verified hero, monthly listeners, Follow, Popular with counts"],
-        ["13", "Album / Single page", "M2", "Tracks, save/download/share, credits, more by artist"],
-        ["14", "Radio / Browse genre", "M2", "Station hero + track list; genre page with card rows"],
+        ["12", "Artist page", "M1", "Verified hero, monthly listeners, Follow, Popular with counts"],
+        ["13", "Album / Single page", "M1", "Tracks, save/download/share, credits, more by artist"],
+        ["14", "Radio / Browse genre", "M1", "Station hero + track list; genre page with card rows"],
         ["15", "Library", "M3", "Tabs, sub-chips, sort + grid, pinned Liked Songs, empty states"],
         ["16", "Recents grouped", "M3", "Today / Yesterday / date sections with activity subtitles"],
         ["17", "Profile drawer", "M3", "User card, recents, settings; social rows flagged off"],
         ["18", "Settings", "M4", "Data saver, playback, storage, about; sleep timer sheet"],
         ["19", "Share / create / toast", "M3", "System share targets, playlist name dialog, confirmations"],
-        ["20", "Mini player", "M1", "Floating, per-track tint, progress hairline, tap to expand"],
+        ["20", "Mini player", "M2", "Floating, per-track tint, progress hairline, tap to expand"],
+        ["21", "Taste picker (S-31)", "M3", "Onboarding step 2: pick 3+ artists you love; seeds the taste profile (v1.1)"],
+        ["22", "Adaptive home shelves (S-32)", "M5", "Shelf registry output replaces static rows, per listener state (v1.1)"],
+        ["23", "Charts - Top 50 (S-33)", "M5", "Real global Top 50 + Your Top 50 from the daily snapshot (v1.1)"],
     ],
     [0.05, 0.24, 0.09, 0.62],
-    caption="Table 2-2. Screen clusters mapped to milestones (M1 through M4).",
+    caption="Table 2-2. Screen clusters mapped to milestones (M1 through M5).",
     font=8, align_center_cols=(0, 2))
 
 story.append(heading("2.3 Acceptance criteria for the big rocks", "h2"))
@@ -372,6 +379,7 @@ story += bullets([
     "<b>F3 Build a playlist:</b> create, name, add tracks from search, hold-drag to reorder, swipe to remove - order persists after restart and syncs to the server.",
     "<b>F4 Commute offline:</b> download a playlist on Wi-Fi, enable airplane mode, reopen the app straight into offline library - tracks and cached lyrics play.",
     "<b>F5 Sleep timer:</b> set 30 minutes (or end-of-track); at zero, playback fades out and pauses with confirmation.",
+    "<b>F6 Personalized home (v1.1):</b> pick three or more artists in the taste picker, land on Home - shelves match the listener state, the charts page shows a real Top 50, and the nightly job refreshes both.",
 ])
 story += body(
     "Non-functional targets: cold start under 2.5 s on a mid-range Android, playback start under "
@@ -400,7 +408,7 @@ story += make_table(
     [0.13, 0.29, 0.58],
     caption="Table 3-1. Stack decisions and their rationale. React Native, Flutter and Firebase were explicitly rejected.")
 
-story += figure("/home/z/my-project/scripts/print-architecture.png",
+story += figure(os.path.join(os.path.dirname(os.path.abspath(__file__)), "print-architecture.png"),
                 "Figure 3-1. Four-layer system architecture. Dashed cards are external providers behind the adapter interface.",
                 max_h=505)
 story.append(heading("3.2 The catalog adapter - the most important interface in the system", "h2"))
@@ -436,7 +444,8 @@ story += body(
 
 # =============================================================== Chapter 4
 story += h1_block("4. Data Model and API", body(
-    "Eleven tables cover the entire product. The Device table is the user: a UUID, a display name, "
+    "Eleven core tables cover the product through M4; five derived tables added in v1.1 power "
+    "personalization from M5. The Device table is the user: a UUID, a display name, "
     "a platform, and a hashed API key. There is no email, no password, and no profile table - the "
     "no-login principle is structural, not cosmetic. Catalog rows (Artist, Album, Track, Lyrics) "
     "carry a source and external ID so the same table serves both providers. Client databases "
@@ -462,9 +471,14 @@ story += make_table(
         ["PUT/DELETE /v1/library/:type/:id", "Follow / save and their inverses"],
         ["POST /v1/events/listen", "Batched listen events, replayed after offline"],
         ["GET /v1/recents", "Recents feed grouped by day"],
+        ["POST /v1/me/taste", "Taste picker submit: 3+ artist ids seed the taste profile (M5)"],
+        ["GET /v1/home/shelves", "Adaptive home: shelves + payloads for the listener state (M5)"],
+        ["GET /v1/charts?scope=&window=", "Global or personal Top 50 snapshot (M5)"],
+        ["GET /v1/artists/:id/similar", "Similar artists from taste-space neighbors (M5)"],
+        ["GET /v1/me/state", "Current listener state + signal summary (M5)"],
     ],
     [0.42, 0.58],
-    caption="Table 4-1. The v1 API surface (24 endpoints; grouped rows combine method pairs).", font=8.5)
+    caption="Table 4-1. The v1 API surface (29 endpoints: 24 core + 5 personalization; grouped rows combine method pairs).", font=8.5)
 story.append(heading("4.1 Lyrics synchronization - the -500 ms rule", "h2"))
 story += body(
     "Lyrics use standard LRC (timestamped lines, multiple stamps per line allowed). Resolution "
@@ -489,8 +503,32 @@ story += body(
     "plain text without the highlight; instrumental rows render as spaced note glyphs at reduced "
     "opacity, exactly as the mockup shows.")
 
+story.append(heading("4.2 The personalization engine (v1.1)", "h2"))
+story += body(
+    "Personalization is first-class, not a bolt-on (decision D-011). Onboarding's taste picker "
+    "collects three or more loved artists and seeds the profile, so day one already feels personal. "
+    "From then on, listen events feed a rules-based SQL scorer - plays, skips, completions, likes "
+    "and recency with fixed weights - that maintains one listener state per device (new, casual, "
+    "regular, super-fan) and an affinity score per artist. A nightly job rolls the day's events "
+    "into daily aggregates, recomputes state and affinity, assembles each device's shelf set from "
+    "a server-side shelf registry (Recent rotation, Because you listened, Similar artists, Rising "
+    "OPM, Your Top 50), and snapshots the global Top 50. There is no ML, no vector store, and no "
+    "new cost: plain PostgreSQL, batched queries, one cron entry.")
+story += make_table(
+    ["Derived table", "Key columns", "Purpose"],
+    [
+        ["TasteProfile", "device_id, artist_id, plays, skips, likes, last_played_at, affinity", "Per-device artist affinity; seeded by the taste picker"],
+        ["ListenerState", "device_id (pk), state, signals json, entered_at", "new / casual / regular / super-fan; drives shelf selection"],
+        ["DailyListenStat", "device_id, day, plays, minutes", "Nightly rollup of ListenEvents"],
+        ["ShelfSnapshot", "device_id, shelf_id, rank, payload json, built_at", "Registry output rendered as the adaptive home"],
+        ["ChartSnapshot", "scope, window_start, rank, track_id, plays", "Global and per-device Top 50, daily"],
+    ],
+    [0.18, 0.44, 0.38],
+    caption="Table 4-2. The five derived personalization tables (v1.1). They land in the Prisma schema at M5.",
+    font=8.5)
+
 # =============================================================== Chapter 5
-story += figure("/home/z/my-project/scripts/print-data-model.png",
+story += figure(os.path.join(os.path.dirname(os.path.abspath(__file__)), "print-data-model.png"),
                 "Figure 4-1. Entity-relationship overview. Remaining relations are foreign keys listed inside each card.",
                 max_h=505)
 story += h1_block("5. Design System", body(
@@ -546,30 +584,33 @@ story += body(
 # =============================================================== Chapter 6
 story += h1_block("6. Roadmap and Milestones", body(
     "The plan assumes one builder, eight to ten hours per week, and a rule of the road: if a week "
-    "is lost, the buffer absorbs it and scope moves out of the milestone - quality gates never "
+    "is lost, scope moves out of the milestone - quality gates never "
     "move. Every milestone ends with something demoable, not merely written. Week 1 begins Monday, "
-    "November 23, 2026; the program ends in early June 2027 with two weeks of buffer."))
-story += figure("/home/z/my-project/scripts/print-gantt.png",
-                "Figure 6-1. The 28-week solo roadmap. The hatched tail is deliberate slack.", max_h=250)
+    "November 23, 2026; the 26-week program ends May 23, 2027. v1.1 reorders the build: catalog "
+    "and search land before playback, so the adapter risk surfaces early and the player is built "
+    "against a real, searchable catalog."))
+story += figure(os.path.join(os.path.dirname(os.path.abspath(__file__)), "print-gantt.png"),
+                "Figure 6-1. The 26-week solo roadmap (v1.1): catalog and search now precede playback.", max_h=250)
 story += make_table(
     ["ID", "Weeks", "Dates", "Demo at the gate"],
     [
-        ["M0", "1-2", "Nov 23-Dec 6", "Fresh clone builds both apps; they hit the health endpoint; tokens render; CI green"],
-        ["M1", "3-8", "Dec 7-Jan 17", "Play a song (own catalog), background audio, lock-screen controls, mini player, queue remove"],
-        ["M2", "9-13", "Jan 18-Feb 21", "Search a title, results by type chip, play from the YT Music adapter; Home feed, artist and album pages"],
-        ["M3", "14-18", "Feb 22-Mar 28", "Full playlist CRUD with drag reorder persisting, likes, Library tabs, recents, profile drawer"],
-        ["M4", "19-23", "Mar 29-May 2", "Synced lyrics with the 0.5 s lead and tap-to-seek; airplane-mode playback; sleep timer; settings"],
-        ["M5", "24-26", "May 3-May 23", "Two-week beta with five testers, crash-free 99.5%, store listing, first public APK"],
+        ["M0", "1-4", "Nov 23-Dec 20", "Foundations complete: scaffold, tokens, server core, both app skeletons, CI green, OpenAPI skeleton (finished Nov 22, ahead of schedule)"],
+        ["M1", "5-8", "Dec 21-Jan 17", "Search a title -> suggestions -> results by type chip -> artist page -> popular list; own-catalog browsing with the YT adapter behind a flag"],
+        ["M2", "9-13", "Jan 18-Feb 21", "Play a song (own catalog), background audio, lock-screen controls, mini player, queue remove"],
+        ["M3", "14-17", "Feb 22-Mar 21", "Full playlist CRUD with drag reorder persisting, likes, Library tabs, recents, taste picker at onboarding"],
+        ["M4", "18-21", "Mar 22-Apr 18", "Synced lyrics with the 0.5 s lead and tap-to-seek; airplane-mode playback; sleep timer; settings"],
+        ["M5", "22-24", "Apr 19-May 9", "Adaptive home shelves from the nightly job, similar artists, rising picks, real Top 50 charts"],
+        ["M6", "25-26", "May 10-May 23", "TestFlight / Play internal beta with five friends, crash-free 99.5%, store listing, first public APK"],
     ],
     [0.07, 0.09, 0.16, 0.68],
     caption="Table 6-1. Milestones with their gate demos. Full acceptance criteria live in the repository roadmap.",
     font=8.5, align_center_cols=(0, 1))
 story += body(
-    "Two structural decisions protect the schedule. First, a risk checkpoint at the end of week 10: "
+    "Two structural decisions protect the schedule. First, a risk checkpoint at the end of week 8: "
     "if the adapter proves unreliable - more than ten percent stream-resolution failures across a "
-    "test corpus - M2 pivots to own-catalog browsing and the adapter moves to the buffer, rather "
-    "than letting a broken upstream stall the whole plan. Second, an honest fallback if M1 runs "
-    "more than two weeks late: lead with Android only through M4 and port to iOS in one focused "
+    "test corpus - M1 completes with own-catalog browsing and the adapter moves out of the "
+    "milestone, rather than letting a broken upstream stall the whole plan. Second, an honest fallback if M2 "
+    "(playback) runs more than two weeks late: lead with Android only through M4 and port to iOS in one focused "
     "six-week block, since every API, design and algorithm artifact transfers - only the UI and "
     "player glue is rewritten. The weekly rhythm is two weeknight sessions of ninety minutes on "
     "the smallest current task, one weekend block of four to five hours on the week's main "
@@ -613,7 +654,7 @@ story += body(
 
 # =============================================================== Chapter 8
 story += h1_block("8. Risk Register", body(
-    "Twelve risks are scored likelihood times impact on a 1-to-5 scale. A score of 12 or more "
+    "Fourteen risks are scored likelihood times impact on a 1-to-5 scale. A score of 12 or more "
     "requires an active mitigation in the current milestone; 16 or more requires a plan-B decision "
     "at the next gate. Three risks actually kill solo projects - upstream breakage, schedule slip "
     "and scope creep - and those three are re-scored at every gate before any new work is "
@@ -633,6 +674,8 @@ story += make_table(
         ["R-10", "API abuse via the stream endpoint", "2", "3", "6", "Device-key auth, rate limits, signed short-TTL URLs"],
         ["R-11", "Low-end Android performance", "3", "3", "9", "NFRs tested on a budget device from M1; defer art animations if cold start exceeds 2.5 s"],
         ["R-12", "Dependency or font license drift", "1", "2", "2", "Figtree is OFL; npm audit and license checks in CI"],
+        ["R-13", "Personalization cold start (no signals yet)", "3", "2", "6", "Taste picker seeds the profile at onboarding; charts-driven default shelves. Trigger: empty shelves on first run - fall back to editorial defaults"],
+        ["R-14", "Nightly scoring job stalls the database", "2", "2", "4", "Off-peak batch with LIMIT-guarded scans; aggregates precomputed into DailyListenStat and ChartSnapshot; cost alarm"],
     ],
     [0.07, 0.25, 0.04, 0.04, 0.07, 0.53],
     caption="Table 8-1. Scored risk register. L = likelihood, I = impact (1-5).",
@@ -642,20 +685,20 @@ story += make_table(
 story += h1_block("Appendix A. Screen Inventory", body(
     "Every state rendered by the reference mockup, mapped to its screen cluster (Chapter 2) and "
     "the milestone that ships it. Clusters 1 and 20 include states added for the product rather "
-    "than the mockup."))
+    "than the mockup; S-31..S-33 are the v1.1 personalization screens."))
 story += make_table(
     ["Mockup state", "Cluster", "Ships"],
     [
-        ["Home - chips + quick grid + sections", "2 Home", "M2"],
+        ["Home - chips + quick grid + sections", "2 Home", "M1"],
         ["Home - Following chip feed", "2 Home (v2 content)", "v2"],
         ["Home - Podcasts/Audiobooks feeds", "2 Home (v2 content)", "v2"],
-        ["Search - idle with recents", "3 Search idle", "M2"],
-        ["Search - browse grid (genres)", "3 Search idle", "M2"],
-        ["Search - typing suggestions", "4 Search typing", "M2"],
-        ["Search - results with type chips + artist card", "4 Search results", "M2"],
-        ["Now Playing (compact + expanded)", "5 Now Playing", "M1"],
+        ["Search - idle with recents", "3 Search idle", "M1"],
+        ["Search - browse grid (genres)", "3 Search idle", "M1"],
+        ["Search - typing suggestions", "4 Search typing", "M1"],
+        ["Search - results with type chips + artist card", "4 Search results", "M1"],
+        ["Now Playing (compact + expanded)", "5 Now Playing", "M2"],
         ["Full-screen lyrics with tap-to-seek", "6 Lyrics", "M4"],
-        ["Queue sheet (reorder + swipe remove)", "7 Queue", "M1/M4"],
+        ["Queue sheet (reorder + swipe remove)", "7 Queue", "M2/M4"],
         ["Track action sheet", "8 Track sheet", "M3"],
         ["Add-to-playlist sheet + find field", "8 Track sheet", "M3"],
         ["Playlist detail + recommended", "9 Playlist", "M3"],
@@ -663,11 +706,11 @@ story += make_table(
         ["Name & details (cover, private, delete)", "10 Edit", "M3"],
         ["Add songs (search + toggle)", "9/11 Add flows", "M3"],
         ["Liked Songs page", "11 Liked", "M3"],
-        ["Artist page (verified, popular, releases)", "12 Artist", "M2"],
-        ["Album page", "13 Album", "M2"],
-        ["Single page + pre-save banner", "13 Album (banner v2)", "M2"],
-        ["Radio station page", "14 Radio/Browse", "M2"],
-        ["Browse genre page", "14 Radio/Browse", "M2"],
+        ["Artist page (verified, popular, releases)", "12 Artist", "M1"],
+        ["Album page", "13 Album", "M1"],
+        ["Single page + pre-save banner", "13 Album (banner v2)", "M1"],
+        ["Radio station page", "14 Radio/Browse", "M1"],
+        ["Browse genre page", "14 Radio/Browse", "M1"],
         ["Library tabs + sub-chips + sort/grid", "15 Library", "M3"],
         ["Library search + empty states", "15 Library", "M3"],
         ["Recents grouped by day", "16 Recents", "M3"],
@@ -676,11 +719,14 @@ story += make_table(
         ["Sleep timer sheet", "18 Settings", "M4"],
         ["Share sheet (8 targets)", "19 Share", "M3"],
         ["Create sheet + playlist-name dialog + toasts", "19 Create/toast", "M3"],
-        ["Mini player (persistent)", "20 Mini player", "M1"],
+        ["Mini player (persistent)", "20 Mini player", "M2"],
         ["Onboarding - name entry (new screen)", "1 Onboarding", "M1"],
+        ["Taste picker - pick 3+ artists (S-31)", "21 Taste picker", "M3"],
+        ["Adaptive home - shelves (S-32)", "22 Adaptive home", "M5"],
+        ["Charts - Top 50 (S-33)", "23 Charts", "M5"],
     ],
     [0.52, 0.33, 0.15],
-    caption="Table A-1. Full state inventory (32 states including v2-flagged content and the new onboarding).",
+    caption="Table A-1. Full state inventory (35 states including v2-flagged content, onboarding and the three v1.1 personalization screens).",
     font=8, align_center_cols=(2,))
 
 # =============================================================== Appendix B
@@ -702,7 +748,7 @@ story += body(
     "design/reference-mockup.html.")
 
 # ================================================================== build
-OUT = "/home/z/my-project/scripts/blueprint-body.pdf"
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "blueprint-body.pdf")
 doc = TocDocTemplate(
     OUT, pagesize=A4,
     leftMargin=MARGIN, rightMargin=MARGIN,

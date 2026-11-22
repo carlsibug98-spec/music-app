@@ -1,5 +1,7 @@
 """Merge cover + body into the final blueprint PDF with A4 normalization."""
+import os
 from pypdf import PdfReader, PdfWriter
+BP = os.path.dirname(os.path.abspath(__file__)) + os.sep
 
 A4_W, A4_H = 595.28, 841.89
 
@@ -12,8 +14,8 @@ def normalize(page):
 
 
 writer = PdfWriter()
-writer.add_page(normalize(PdfReader("/home/z/my-project/scripts/blueprint-cover.pdf").pages[0]))
-for p in PdfReader("/home/z/my-project/scripts/blueprint-body.pdf").pages:
+writer.add_page(normalize(PdfReader(BP + "blueprint-cover.pdf").pages[0]))
+for p in PdfReader(BP + "blueprint-body.pdf").pages:
     writer.add_page(normalize(p))
 writer.add_metadata({
     "/Title": "Music App Creation Blueprint",
@@ -21,7 +23,7 @@ writer.add_metadata({
     "/Creator": "Z.ai",
     "/Subject": "Creation blueprint for a free, no-login, ad-free native music app",
 })
-out = "/home/z/my-project/scripts/blueprint-final.pdf"
+out = BP + "blueprint-final.pdf"
 with open(out, "wb") as f:
     writer.write(f)
 
