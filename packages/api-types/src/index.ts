@@ -59,7 +59,7 @@ export interface DeviceRegistrationResponse {
   created_at: ISODateString;
 }
 
-/* ---------- Catalog (M1+ — shapes agreed now) ---------- */
+/* ---------- Catalog (M1) ---------- */
 
 export interface TrackSummary {
   id: UUID;
@@ -67,10 +67,14 @@ export interface TrackSummary {
   artist_id: UUID;
   artist_name: string;
   album_id?: UUID | null;
+  album_title?: string | null;
   duration_ms: number;
   has_lyrics: boolean;
   explicit: boolean;
   art_url?: string | null;
+  /** Demo/seed popularity metric used to order "Popular" lists. */
+  play_count: number;
+  genres: string[];
 }
 
 export interface AlbumSummary {
@@ -81,6 +85,7 @@ export interface AlbumSummary {
   type: 'album' | 'single' | 'ep';
   release_date?: string | null;
   art_url?: string | null;
+  track_count: number;
 }
 
 export interface ArtistSummary {
@@ -88,6 +93,152 @@ export interface ArtistSummary {
   name: string;
   art_url?: string | null;
   is_verified: boolean;
+  genres: string[];
+}
+
+export interface ArtistDetail extends ArtistSummary {
+  bio?: string | null;
+  /** Distinct devices that played this artist in the last 28 days (0 until playback ships). */
+  monthly_listeners: number;
+  top_tracks: TrackSummary[];
+  releases: AlbumSummary[];
+}
+
+export interface AlbumDetail extends AlbumSummary {
+  tracks: TrackSummary[];
+  more_by_artist: AlbumSummary[];
+}
+
+export interface TrackDetail extends TrackSummary {
+  /** True once M4 lands the LRC pipeline; clients show the lyrics affordance only when true. */
+  lyrics_available: boolean;
+}
+
+/* ---------- Search (M1) ---------- */
+
+export type SearchType = 'song' | 'album' | 'artist' | 'playlist';
+
+export interface SearchSuggestion {
+  /** "query" repeats the typed text so the field can submit it verbatim. */
+  type: 'query' | 'song' | 'album' | 'artist';
+  text: string;
+  subtitle?: string;
+  id?: UUID;
+}
+
+export interface SearchSuggestResponse {
+  query: string;
+  suggestions: SearchSuggestion[];
+}
+
+/** Playlist search results stay empty until M3; the contract is declared now. */
+export interface PlaylistSummary {
+  id: UUID;
+  name: string;
+  owner: string;
+  track_count: number;
+  art_url?: string | null;
+}
+
+export interface SearchResponse {
+  query: string;
+  type: SearchType | 'all';
+  /** Applied per result group, not across the combined set. */
+  limit: number;
+  offset: number;
+  /** Combined count across the returned groups (before pagination). */
+  total: number;
+  /** True when a source (the YTM adapter) failed and cached/own rows were served instead. */
+  degraded: boolean;
+  /** Artist card shown above results when the query matches an artist name. */
+  artist_header?: ArtistSummary | null;
+  songs: TrackSummary[];
+  albums: AlbumSummary[];
+  artists: ArtistSummary[];
+  playlists: PlaylistSummary[];
+}
+
+/* ---------- Home & browse (M1) ---------- */
+
+export type CatalogCardKind = 'track' | 'album' | 'artist' | 'genre';
+
+export interface CatalogCard {
+  kind: CatalogCardKind;
+  id: string;
+  title: string;
+  subtitle?: string;
+  art_url?: string | null;
+}
+
+export interface HomeRow {
+  key: string;
+  title: string;
+  items: CatalogCard[];
+}
+
+export interface HomeResponse {
+  greeting: string;
+  quick_grid: CatalogCard[];
+  rows: HomeRow[];
+}
+
+export interface GenreSummary {
+  id: string;
+  name: string;
+  /** Five promotable categories (OPM, Hugot, Chill, Indie, Late Night) shown first. */
+  featured: boolean;
+  track_count: number;
+  art_url?: string | null;
+}
+
+export interface GenresResponse {
+  genres: GenreSummary[];
+}
+
+export interface GenreDetailResponse {
+  genre: GenreSummary;
+  tracks: TrackSummary[];
+}
+
+export interface StationResponse {
+  seed: string;
+  title: string;
+  description: string;
+  tracks: TrackSummary[];
+}
+
+/* ---------- Signals (capture in M1; feeds M5) ---------- */
+
+export interface ListenEventInput {
+  track_id: UUID;
+  played_at?: ISODateString;
+  ms_played: number;
+  completed: boolean;
+}
+
+export interface ListenEventsRequest {
+  events: ListenEventInput[];
+}
+
+export interface ListenEventsResponse {
+  accepted: number;
+}
+
+export interface RecentItem {
+  track: TrackSummary;
+  played_at: ISODateString;
+  ms_played: number;
+  completed: boolean;
+}
+
+export interface RecentGroup {
+  /** "today" | "yesterday" | an ISO date for older groups. */
+  day: string;
+  items: RecentItem[];
+}
+
+export interface RecentsResponse {
+  groups: RecentGroup[];
 }
 
 /* ---------- Personalization (M3/M5 — shapes agreed now) ---------- */

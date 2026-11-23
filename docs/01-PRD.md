@@ -2,7 +2,7 @@
 
 **Project:** Tugtugin — free music app
 **Version:** 1.1 · **Date:** 2026-11-22 · **Owner:** carlsibug98-spec (solo builder)
-**Status:** Approved for M0 · v1.1 = synced to the consolidated blueprint (FR-16..21, S-31..S-33, D-011 personalization)
+**Status:** Approved for M0 · v1.1 = synced to the consolidated blueprint (FR-16..21, S-31..S-33, D-011 personalization). M1 catalog/search is implemented (see `PROGRESS.md`); onboarding remains name-only — the 3+ artist taste picker (S-31) ships in M3.
 
 ---
 

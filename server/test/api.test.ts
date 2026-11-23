@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
-import { createApp } from '../src/app.js';
+import { makeTestApp } from './testApp.js';
 
-const app = createApp();
+const { app } = makeTestApp();
 
 describe('GET /healthz', () => {
   it('returns ok with version and uptime', async () => {
@@ -78,11 +78,16 @@ describe('POST /v1/devices', () => {
 
 describe('error envelope', () => {
   it('returns RFC 7807 problem for unknown routes', async () => {
-    const res = await request(app).get('/v1/nope');
+    const res = await request(app).get('/nope');
     expect(res.status).toBe(404);
     expect(res.headers['content-type']).toContain('application/problem+json');
     expect(res.body.title).toBe('Not found');
     expect(res.body.trace_id).toBeTruthy();
+  });
+
+  it('does not leak whether a protected path exists', async () => {
+    const res = await request(app).get('/v1/nope');
+    expect(res.status).toBe(401);
   });
 
   it('returns 400 problem for malformed JSON', async () => {

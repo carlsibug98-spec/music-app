@@ -35,11 +35,13 @@ Gantt: `docs/diagrams/roadmap-gantt.png` (regenerated for v1.1).
 
 **Build:** swap the in-memory device store for a Prisma store · catalog loader (seeds Artist/Album/Track/Lyrics from `local-media/manifest.json`) · `OwnCatalogProvider` + admin upload path · `YtmProvider` metadata + search behind a build flag (24 h cache + persisted rows) · suggest + search endpoints · browse genres · artist/album/single pages · radio station endpoint + page · Home endpoint (quick grid, card rows) · recents capture (`ListenEvent`).
 
-**Demo script:** search "panata" → suggestions → results grouped by chip → artist page → popular list. (No audio yet — playback is M2; demo the catalog in the emulator against the dev API.)
+**Demo script:** search "panata" → suggestions → results grouped by chip → artist page → popular list. (No audio yet — playback is M2; demo the catalog on the TECNO LJ6 against the dev API via `adb reverse`.)
 
 **Quality gates:** suggest p95 < 300 ms; search results stable across 20 queries; adapter failures fall back to cached rows with a toast, never a crash.
 
 **Risk checkpoint (end of wk 8):** if the adapter is unreliable (> 10 % stream resolution failures), M1 completes with own-catalog browsing and the adapter moves out of the milestone — the plan survives (R-01).
+
+**Status: done — PR #2 green (D-012 pass on `566192e`, 2026-11-22).** Server catalog/search/home/genres/station/artist/album/track/recents/listen on Prisma (38/38 tests, OpenAPI 28 paths) and the Android M1 screens were verified end-to-end on the TECNO LJ6. The YTM resolver sidecar is out of M1 scope (D-014); iOS M1 UI is deferred because no macOS host is available (D-015). CI run 45037702609: both jobs green, `resona-debug-apk` artifact present.
 
 ## M2 — Playback core (wks 9–13)
 

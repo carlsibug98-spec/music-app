@@ -64,6 +64,8 @@ model Artist {
   name       String
   bio        String?
   artUrl     String?       @map("art_url")
+  /** Curated tags; browse genres aggregates Track.genres instead. */
+  genres     String[]      @default([])
   isVerified Boolean       @default(false) @map("is_verified")
   source     CatalogSource
   externalId String?       @map("external_id")
@@ -84,11 +86,14 @@ model Album {
   type        ReleaseType @default(album)
   releaseDate DateTime?   @map("release_date") @db.Date
   artUrl      String?     @map("art_url")
+  source      CatalogSource @default(own)
+  externalId  String?     @map("external_id")
   createdAt   DateTime    @default(now()) @map("created_at")
 
   artist Artist  @relation(fields: [artistId], references: [id], onDelete: Cascade)
   tracks Track[]
 
+  @@unique([source, externalId])
   @@index([artistId])
   @@map("albums")
 }
@@ -99,8 +104,14 @@ model Track {
   artistId   String        @map("artist_id") @db.Uuid
   albumId    String?       @map("album_id") @db.Uuid
   durationMs Int           @map("duration_ms")
+  /** 1-based position within the album; 0 for loose/single tracks. */
+  trackNumber Int          @default(0) @map("track_number")
   hasLyrics  Boolean       @default(false) @map("has_lyrics")
   playCount  Int           @default(0) @map("play_count")
+  /** Per-track art override; falls back to album/artist art. */
+  artUrl     String?       @map("art_url")
+  /** Free-form genre tags; browse genres aggregates these (no extra table). */
+  genres     String[]      @default([])
   source     CatalogSource
   externalId String?       @map("external_id")
   explicit   Boolean       @default(false)

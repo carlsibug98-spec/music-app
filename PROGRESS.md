@@ -19,7 +19,7 @@ Living status board — updated at every milestone gate and whenever a decision 
 | Diagrams (architecture, ER, pipeline, gantt) | **Done** | `docs/diagrams/` — roadmap gantt regenerated to the 26-week v1.1 plan |
 | Consolidated PDF blueprint | **Done (v1.1)** | `docs/blueprints/music-app-creation-blueprint.pdf` — v1.1 committed in-repo (18 pages, A4); toolchain in `docs/blueprints/toolchain/` is the build source |
 | M0 — Foundations | **Done** | All checklist items including the demo video; CI verifies Android build on every push |
-| M1 — Catalog + search | Not started | wks 5–8 |
+| M1 - Catalog + search | **Done - PR #2 green** | Server catalog/search/home/genres/station/recents/listen on Prisma (38 tests) + Android onboarding/Home/Search/Artist/Album/Single/Genre/Radio, verified end-to-end on the TECNO LJ6. iOS M1 screens deferred (D-015). D-012 closed on `566192e`: CI run [45037702609](https://github.com/carlsibug98-spec/music-app/actions/runs/45037702609) success, `resona-debug-apk` artifact 10.5 MB |
 | M2 — Playback core | Not started | wks 9–13 |
 | M3 — Library, playlists, taste picker | Not started | wks 14–17 |
 | M4 — Lyrics + offline | Not started | wks 18–21 |
@@ -38,6 +38,32 @@ Living status board — updated at every milestone gate and whenever a decision 
 - [x] MIT license added (`LICENSE`, all `package.json` files) — closes D-010
 - [x] First 30-second demo video of the week — `docs/demo-scripts/2026-11-22-m0.mp4` (real phone, real CI run, real test output)
 
+## M1 checklist - done (D-012 closed on `566192e`)
+
+**Server (Postgres + Prisma):**
+- [x] Device store swapped to Prisma; `X-Device-Key` required on all catalog routes; 401 RFC 7807 envelope; keys hashed at rest
+- [x] Catalog seed: 4 artists / 4 albums / 10 tracks with LRC lyrics, generated into `server/src/catalog/catalog.seed.ts` by `server/scripts/build-catalog-seed.mjs`; `npm run seed -w server` applies it
+- [x] Schema M1: `Artists.genres`, `Track.genres`, `Track.track_number`, `Track.art_url`, `Album.source`/`external_id`; no Genre table — genre tiles derive from these arrays
+- [x] Search ranking lives in one module (`server/src/catalog/ranking.ts`) shared by in-memory tests and Prisma
+- [x] Endpoints: `GET /v1/home`, `GET /v1/search/suggest`, `GET /v1/search` (artist header, type chips), `GET /v1/browse/genres[/:id]`, `GET /v1/stations/:seed`, `GET /v1/artists/:id`, `GET /v1/albums/:id`, `GET /v1/tracks/:id`, `GET /v1/recents`, `POST /v1/events/listen`
+- [x] YTM provider behind `CATALOG_YTM_ENABLED=false`, 24 h cache, own-catalog fallback flagged `degraded`; resolver sidecar deferred (D-014)
+- [x] OpenAPI 28 paths / 27 schemas; RFC 7807 problems throughout
+- [x] Checks: `npm run lint|typecheck|build|prisma:validate` clean; `npm test -w server` 38/38
+- [x] Live smoke on Postgres: register 201, home 4 rows, suggest ≈20 ms, search total 4, artist/album/genre/station 200, listen 202, recents grouped, `/media/cover-01.png` served, non-UUID ids 404 (not 500)
+
+**Android (Compose, package `com.resona.app`):**
+- [x] Name-only onboarding → device registration; device key in SharedPreferences; 401 returns to onboarding
+- [x] App shell: Home/Search bottom nav, back handling, per-destination saveable state
+- [x] Home (quick grid + server rows), Search idle (recents + genres), typing (debounced suggestions), results (All/Songs/Albums/Artists chips), Artist, Album, Single, Genre, Radio
+- [x] Search bar lives on Search only — Home stays the feed (mockup §2)
+- [x] Artwork via Coil; debug-only "Log a 30 s listen" exercises `POST /v1/events/listen` on device
+- [x] Builds with `gradle assembleDebug -Presona.apiBaseUrl=http://127.0.0.1:3000`; verified end-to-end on the TECNO LJ6 (search → album → artist → radio → listen → recents)
+
+**Deferred / pending:**
+- [ ] iOS M1 UI — D-015: no macOS host on this machine, so it cannot be built or verified; SwiftUI layer stays M0 skeleton until a Mac is available
+- [ ] M1 demo video ritual (screenshots captured; video not yet recorded)
+- [ ] Final D-012 check on the pushed SHA: CI green + APK artifact present
+
 ## Decision log
 
 | ID | Date | Decision | Rationale |
@@ -55,9 +81,12 @@ Living status board — updated at every milestone gate and whenever a decision 
 | D-011 | 2026-11-22 | Personalization is first-class: onboarding taste picker (3+ artists), shelf-based adaptive home, similar artists, rising/viral, real Top 50 charts; rules-based SQL, no ML, $0 | User request; blueprint v1.1 Ch. 4.2, roadmap M5 |
 | D-012 | 2026-11-22 | Every deliverable is re-verified before reporting done: local suite (lint, typecheck, tests, prisma validate), token-regen diff, git sync vs origin, CI run status for the exact pushed SHA, artifact presence | User rule "always recheck your work before sending" — CI caught 3 Kotlin bugs CI-only compile would have shipped |
 | D-013 | 2026-11-22 | Blueprint v1.1 reconstructed and committed in-repo: the previously claimed master (`download/Resona_Music_App_Creation_Blueprint.pdf`, 38 pp / 13 ch) was never committed — the repo PDF was the 17-page v1.0. The v1.1 PDF was rebuilt from the committed toolchain (cover v1.1, 26-week gantt, personalization Ch. 4.2, R-13/R-14, S-31..S-33), and markdown docs 01/02/04/06 synced. Personalization specifics (5 derived tables, 5 endpoints, FR-18..21 wording) authored per D-011 as the new authoritative spec | D-012 verification exposed the gap; the repo must be self-consistent before M1 |
+| D-014 | 2026-11-22 | YTM adapter ships as a flag-gated provider (`CATALOG_YTM_ENABLED=false`) with 24 h cache, persistence hooks, and degraded fallback; the extraction sidecar is out of M1 scope | Keeps M1 own-catalog-safe (R-01) and keeps the legal/ToS mechanism out of the API repo until the risk checkpoint |
+| D-015 | 2026-11-22 | M1 Android UI ships now; iOS M1 UI is deferred | The Windows build machine has no macOS host, so iOS M1 cannot be built or verified here. API, DTOs, and design tokens are shared; SwiftUI work resumes on a Mac |
 
 ## Changelog
 
+- **2026-11-22 (M1 catalog & search — done, PR #2 green)** — Server: Prisma device store + `X-Device-Key` auth, seeded own catalog (4 artists / 4 albums / 10 tracks, LRC lyrics), single ranking module, suggest/search/home/genres/station/artist/album/track/recents/listen endpoints, flag-gated YTM provider with 24 h cache + degraded fallback, OpenAPI 28 paths, 38/38 tests. Android: name-only onboarding, Home/Search/Artist/Album/Single/Genre/Radio screens, device key storage, Coil artwork, debounced suggestions, type chips, debug listen capture; verified end-to-end on the TECNO LJ6. The Home search entry was removed after review — search lives on the Search tab only (the mockup's Home is a feed, not a search surface). First CI run failed on typecheck because `npm ci` skipped `prisma generate`; the workflow now generates the client before linting (`566192e`), and run 45037702609 is green on both jobs with the `resona-debug-apk` artifact (10.5 MB).
 - **2026-11-22 (D-009 closed — Tugtugin)** — Final app name is **Tugtugin** (Tagalog for "music / the playing of instruments"). Resona stays the internal code identity for now (`com.resona.app`, iOS module, `@resona/*`, API title); the public brand and store listing use Tugtugin. The v1.1 PDF already uses Tugtugin but still labels it a working title, so it remains a pre-decision snapshot. Trademark/store-name clearance stays on the M6 checklist.
 - **2026-11-22 (M0 demo + license + API stubs)** — Recorded and committed the 30-second M0 demo: `docs/demo-scripts/2026-11-22-m0.mp4` (1920×1080, 30 fps, 30.0 s), built from the real TECNO LJ6 screenshot, real `npm test` output, and the green CI run 45011244488 (`be032f9`, 52 s, 8.64 MB APK artifact). Also closed D-010 with MIT (`LICENSE` + all `package.json` files), added the 5 personalization/chart OpenAPI stubs and matching `@resona/api-types` DTOs, and fixed the Windows path bug in `make-test-tracks.mjs` (10/10 tracks verified). M0 is now fully complete; M1 is next.
 - **2026-11-22 (v1.1 doc sync)** — Blueprint v1.1 reconstructed in-repo and markdown docs synced (D-013): `docs/blueprints/music-app-creation-blueprint.pdf` rebuilt via the toolchain (v1.1 cover, §4.2 personalization engine with 5 derived tables, 29-endpoint API, 26-week M0–M6 roadmap + regenerated gantt, 14 risks incl. new R-13/R-14, S-31..S-33 in Table 2-2 and Appendix A); `docs/01-PRD.md` v1.1 (FR-16..21, F6, story 11, S-31..S-33, milestone remap); `docs/02-ARCHITECTURE.md` v1.1 (5 derived tables in §7, 29 endpoints in §8); `docs/04-ROADMAP.md` v1.1 (26-week M0–M6: M1 catalog & search, M2 playback, M3 + taste picker, M5 personalization + charts, M6 deploy + rollout); `docs/06-RISK-REGISTER.md` v1.1 (R-13/R-14, M1→M2 gate references). Toolchain scripts made path-relative so the PDF is reproducible: `python3 build_blueprint.py && python3 render_cover.py && python3 merge_blueprint.py` from `docs/blueprints/toolchain/`.
