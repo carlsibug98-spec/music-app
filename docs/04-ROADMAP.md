@@ -41,7 +41,7 @@ Gantt: `docs/diagrams/roadmap-gantt.png` (regenerated for v1.1).
 
 **Risk checkpoint (end of wk 8):** if the adapter is unreliable (> 10 % stream resolution failures), M1 completes with own-catalog browsing and the adapter moves out of the milestone — the plan survives (R-01).
 
-**Status: code complete — PR open.** Server catalog/search/home/genres/station/artist/album/track/recents/listen on Prisma (38/38 tests, OpenAPI 28 paths) and the Android M1 screens were verified end-to-end on the TECNO LJ6. The YTM resolver sidecar is out of M1 scope (D-014); iOS M1 UI is deferred because no macOS host is available (D-015). Final D-012 check on the pushed SHA pending.
+**Status: done — PR #2 green (D-012 pass on `566192e`, 2026-11-22).** Server catalog/search/home/genres/station/artist/album/track/recents/listen on Prisma (38/38 tests, OpenAPI 28 paths) and the Android M1 screens were verified end-to-end on the TECNO LJ6. The YTM resolver sidecar is out of M1 scope (D-014); iOS M1 UI is deferred because no macOS host is available (D-015). CI run 45037702609: both jobs green, `resona-debug-apk` artifact present.
 
 ## M2 — Playback core (wks 9–13)
 
